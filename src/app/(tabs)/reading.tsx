@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { Heart } from 'lucide-react-native';
 import { BookCard } from '@/components/product/BookCard';
 import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
 import { BOOKS, CONTINUE_READING_BOOKS } from '@/data/books';
@@ -8,6 +10,7 @@ import { useFavoritesStore } from '@/store/favoritesStore';
 import { Typography, Shadows } from '@/constants/theme';
 
 export default function ReadingScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'reading' | 'favorites'>('reading');
   const { favorites } = useFavoritesStore();
 
@@ -42,14 +45,40 @@ export default function ReadingScreen() {
 
       {activeTab === 'reading' ? (
         <FlatList
+          key="reading-list"
           data={CONTINUE_READING_BOOKS}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <ContinueReadingCard book={item} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
+      ) : favoriteBooks.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyIconBox}>
+            <Heart size={32} color="#000000" fill="#FF6B4A" strokeWidth={2.5} />
+          </View>
+          <Text style={styles.emptyTitle}>Your Wishlist is Empty</Text>
+          <Text style={styles.emptySubtitle}>
+            Tap the heart sticker on any book to save your favorite titles here.
+          </Text>
+          <Pressable
+            onPress={() => router.push('/(tabs)/explore')}
+            style={({ pressed }) => [
+              styles.exploreBtn,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
+          >
+            <Text style={styles.exploreBtnText}>Browse Catalog</Text>
+          </Pressable>
+        </View>
       ) : (
         <FlatList
+          key="favorites-grid"
           data={favoriteBooks}
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
@@ -129,5 +158,56 @@ const styles = StyleSheet.create({
   },
   gridItem: {
     flex: 1,
+  },
+  emptyContainer: {
+    padding: 24,
+    marginHorizontal: 20,
+    marginTop: 40,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 0,
+    alignItems: 'center',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.card,
+  },
+  emptyIconBox: {
+    width: 64,
+    height: 64,
+    borderRadius: 0,
+    backgroundColor: '#FFDE59',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#000000',
+    marginBottom: 16,
+    ...Shadows.sm,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 18,
+  },
+  exploreBtn: {
+    backgroundColor: '#FFDE59',
+    borderRadius: 0,
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    ...Shadows.button,
+  },
+  exploreBtnText: {
+    fontSize: 13,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
 });
