@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Star, Sparkles } from 'lucide-react-native';
-import { Colors } from '@/constants/theme';
+import { Colors, Shadows, Typography } from '@/constants/theme';
 
 export type BadgeVariant = 'readNow' | 'popular' | 'rating' | 'discount' | 'neutral';
 
@@ -21,12 +21,17 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <View style={[styles.badgeBase, styles[variant], size === 'md' && styles.sizeMd]}>
       {variant === 'rating' && icon && (
-        <Star size={size === 'md' ? 12 : 10} color={Colors.status.rating} fill={Colors.status.rating} style={styles.icon} />
+        <Star
+          size={size === 'md' ? 12 : 10}
+          color="#000000"
+          fill="#FFDE59"
+          style={styles.icon}
+        />
       )}
       {variant === 'popular' && icon && (
-        <Sparkles size={size === 'md' ? 12 : 10} color={Colors.text.accent} style={styles.icon} />
+        <Sparkles size={size === 'md' ? 12 : 10} color="#000000" style={styles.icon} />
       )}
-      <Text style={[styles.textBase, styles[`${variant}Text`], size === 'md' && styles.textMd]}>
+      <Text style={[styles.textBase, size === 'md' && styles.textMd]}>
         {label}
       </Text>
     </View>
@@ -39,7 +44,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 9999,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#000000',
+    backgroundColor: '#FFDE59',
+    ...Shadows.sm,
   },
   sizeMd: {
     paddingHorizontal: 10,
@@ -50,44 +59,27 @@ const styles = StyleSheet.create({
   },
   textBase: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   textMd: {
     fontSize: 11,
   },
   readNow: {
-    backgroundColor: '#F7EFE2',
-  },
-  readNowText: {
-    color: '#A86C1D',
-    textTransform: 'uppercase',
+    backgroundColor: '#FFDE59',
   },
   popular: {
-    backgroundColor: '#F5ECE0',
-  },
-  popularText: {
-    color: '#9E651D',
+    backgroundColor: '#FF6B4A',
   },
   rating: {
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    borderWidth: 1,
-    borderColor: '#F0E7D8',
-  },
-  ratingText: {
-    color: '#2A221B',
-    fontWeight: '700',
+    backgroundColor: '#FFFFFF',
   },
   discount: {
-    backgroundColor: '#FDF0EF',
-  },
-  discountText: {
-    color: '#C94A3D',
+    backgroundColor: '#FFA6D5',
   },
   neutral: {
-    backgroundColor: '#EFEBE2',
-  },
-  neutralText: {
-    color: '#6B6258',
+    backgroundColor: '#C4A1FF',
   },
 });

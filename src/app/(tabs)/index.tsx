@@ -20,7 +20,7 @@ import {
   BOOKS,
   CONTINUE_READING_BOOKS,
 } from '@/data/books';
-import { Colors, Typography } from '@/constants/theme';
+import { Colors, Typography, Shadows } from '@/constants/theme';
 import { FilterModal, FilterOptions } from '@/components/ui/FilterModal';
 
 export default function HomeScreen() {
@@ -164,7 +164,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F5EE',
+    backgroundColor: '#FFFDF5',
   },
   scrollContent: {
     paddingBottom: 24,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   horizontalListContent: {
     paddingLeft: 20,
     paddingRight: 6,
-    paddingVertical: 10,
+    paddingVertical: 14,
   },
   emptyContainer: {
     padding: 24,
@@ -184,20 +184,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#EFE7DA',
+    borderWidth: 2.5,
+    borderColor: '#000000',
     marginVertical: 12,
+    ...Shadows.card,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
+    fontSize: 17,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     marginBottom: 4,
   },
   emptySubtitle: {
     fontSize: 13,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
     textAlign: 'center',
   },
   bottomSpacer: {

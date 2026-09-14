@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { IconButton } from '@/components/ui/IconButton';
 import { CURRENT_USER } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
+import { Shadows, Typography } from '@/constants/theme';
 
 export const HomeHeader: React.FC = () => {
   const router = useRouter();
@@ -15,17 +16,19 @@ export const HomeHeader: React.FC = () => {
     <View style={styles.container}>
       {/* User Avatar and Info */}
       <View style={styles.userSection}>
-        <Image
-          source={{ uri: CURRENT_USER.avatarUrl }}
-          style={styles.avatar}
-          contentFit="cover"
-          transition={200}
-        />
+        <View style={styles.avatarWrapper}>
+          <Image
+            source={{ uri: CURRENT_USER.avatarUrl }}
+            style={styles.avatar}
+            contentFit="cover"
+            transition={200}
+          />
+        </View>
         <View style={styles.userInfo}>
           <View style={styles.nameRow}>
             <Text style={styles.userName}>{CURRENT_USER.name}</Text>
             {CURRENT_USER.isVerified && (
-              <CheckCircle2 size={14} color="#1D9BF0" fill="#1D9BF0" style={styles.checkIcon} />
+              <CheckCircle2 size={15} color="#000000" fill="#2EEC96" style={styles.checkIcon} />
             )}
           </View>
           <Text style={styles.userEmail}>{CURRENT_USER.email}</Text>
@@ -35,18 +38,18 @@ export const HomeHeader: React.FC = () => {
       {/* Action Buttons: Wishlist & Notifications */}
       <View style={styles.actions}>
         <IconButton
-          icon={<Heart size={18} color="#2A221B" />}
+          icon={<Heart size={18} color="#000000" strokeWidth={2.5} />}
           badgeCount={favorites.length}
           onPress={() => router.push('/(tabs)/reading')}
           accessibilityLabel="Saved books"
-          style={styles.actionButton}
+          backgroundColor="#FFFFFF"
         />
         <IconButton
-          icon={<Bell size={18} color="#2A221B" />}
+          icon={<Bell size={18} color="#000000" strokeWidth={2.5} />}
           badgeCount={CURRENT_USER.unreadNotifications}
           onPress={() => {}}
           accessibilityLabel="Notifications"
-          style={styles.actionButton}
+          backgroundColor="#FFDE59"
         />
       </View>
     </View>
@@ -60,20 +63,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 14,
   },
   userSection: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
+  avatarWrapper: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    overflow: 'hidden',
+    ...Shadows.sm,
+  },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: '#E8DFD0',
-    backgroundColor: '#EDE5D6',
+    width: '100%',
+    height: '100%',
   },
   userInfo: {
     marginLeft: 12,
@@ -84,25 +92,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1A1816',
+    fontSize: 16,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: -0.3,
   },
   checkIcon: {
-    marginLeft: 4,
+    marginLeft: 5,
   },
   userEmail: {
-    fontSize: 12,
-    color: '#8C8276',
+    fontSize: 11,
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
     marginTop: 1,
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  actionButton: {
-    borderWidth: 1,
-    borderColor: '#ECE4D7',
+    gap: 12,
   },
 });

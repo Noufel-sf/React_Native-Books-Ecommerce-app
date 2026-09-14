@@ -1,39 +1,54 @@
 export const Colors = {
-  // Editorial Parchment & Warm Papers
-  background: '#F8F5EE',       // App main background - warm cream
-  surface: '#FFFFFF',          // Card & elevated elements background
-  surfaceSubtle: '#F3EFE6',    // Secondary cards / inputs
-  surfaceHighlight: '#FAF7F2', // Hover / pressed state
-  border: '#E8E1D5',           // Soft paper dividers and borders
-  borderSubtle: '#F0EBE1',
+  // Neobrutalist Canvas & Core
+  background: '#FFFDF5',       // Warm energetic canvas
+  surface: '#FFFFFF',          // Crisp white card surface
+  surfaceSubtle: '#F4EFE6',
+  border: '#000000',           // Signature thick black outline
 
-  // Deep Espresso & Ink Typographic Hierarchy
+  // Deep Solid Black Typography
   text: {
-    primary: '#1A1816',        // Deepest charcoal/espresso for main headers & titles
-    secondary: '#5C544B',      // Warm charcoal for descriptions & subtitles
-    muted: '#8C8276',          // Muted taupe for meta, dates, badges
-    inverse: '#FFFFFF',        // White text on dark/gold buttons
-    accent: '#B87826',         // Gold/amber editorial accent text
+    primary: '#000000',        // Pure black for maximum punch
+    secondary: '#222222',
+    muted: '#666666',
+    inverse: '#FFFFFF',
+    accent: '#000000',
   },
 
-  // Rich Warm Amber / Honey Gold Accents (from reference image)
-  accent: {
-    DEFAULT: '#D48C2B',
-    hover: '#BC761E',
-    light: '#F8EFE0',          // Soft gold pill badge background
-    border: '#E8D4B8',
-    gradientStart: '#E8A748',
-    gradientEnd: '#B8731F',
+  // High-Energy Neobrutalist Color Palette
+  neo: {
+    yellow: '#FFDE59',         // Electric Canary (Primary action)
+    yellowDark: '#ECC628',
+    orange: '#FF6B4A',         // Punchy Coral/Orange
+    green: '#2EEC96',          // Slime / Mint Green
+    purple: '#C4A1FF',         // Electric Lavender
+    blue: '#68B5FF',           // Sky Pop Blue
+    pink: '#FFA6D5',           // Bubblegum Pink
+    cream: '#FAF7EE',
   },
 
-  // Status & Utility Colors
+  // Status Colors
   status: {
-    rating: '#E89F2A',         // Star rating gold
-    discount: '#C94A3D',       // Crimson red discount badge
-    badge: '#FAF1E3',          // "READ NOW" badge background
-    badgeText: '#A86C1D',      // "READ NOW" badge text
-    notification: '#E04838',   // Bell alert red dot
-    success: '#3A8A5B',
+    rating: '#000000',
+    starFill: '#FFDE59',
+    discount: '#FF5733',
+    badge: '#FFDE59',
+    badgeText: '#000000',
+    notification: '#FF4136',
+    success: '#2EEC96',
+  },
+} as const;
+
+export const Typography = {
+  serif: {
+    semiBold: 'PlayfairDisplay_600SemiBold',
+    bold: 'PlayfairDisplay_700Bold',
+    extraBold: 'PlayfairDisplay_800ExtraBold',
+  },
+  sans: {
+    regular: 'PlusJakartaSans_400Regular',
+    medium: 'PlusJakartaSans_500Medium',
+    semiBold: 'PlusJakartaSans_600SemiBold',
+    bold: 'PlusJakartaSans_700Bold',
   },
 } as const;
 
@@ -51,62 +66,54 @@ export const Spacing = {
 export const BorderRadius = {
   sm: 6,
   md: 10,
-  lg: 16,
-  xl: 22,
-  '2xl': 28,
+  lg: 14,
+  xl: 18,
+  '2xl': 24,
   full: 9999,
 } as const;
 
-export const Typography = {
-  serif: {
-    semiBold: 'PlayfairDisplay_600SemiBold',
-    bold: 'PlayfairDisplay_700Bold',
-    extraBold: 'PlayfairDisplay_800ExtraBold',
-  },
-  sans: {
-    regular: 'PlusJakartaSans_400Regular',
-    medium: 'PlusJakartaSans_500Medium',
-    semiBold: 'PlusJakartaSans_600SemiBold',
-    bold: 'PlusJakartaSans_700Bold',
-  },
-} as const;
-
-// Realistic 3D Book & Card Shadow Tokens
+// Signature Neobrutalist Hard Black Drop Shadows (No blur, crisp offset)
 export const Shadows = {
   sm: {
-    shadowColor: '#2B231D',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: '#000000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 3,
   },
-  md: {
-    shadowColor: '#2B231D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+  card: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 5,
+  },
+  button: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
     elevation: 4,
   },
-  // 3D Perspective Book Cover Drop Shadow
-  bookCover: {
-    shadowColor: '#1A1208',
-    shadowOffset: { width: 6, height: 10 },
-    shadowOpacity: 0.22,
-    shadowRadius: 14,
-    elevation: 10,
+  floatingBar: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 8,
   },
   heroCover: {
-    shadowColor: '#100B06',
-    shadowOffset: { width: 8, height: 14 },
-    shadowOpacity: 0.28,
-    shadowRadius: 18,
-    elevation: 14,
+    shadowColor: '#000000',
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 6,
   },
-  floatingBar: {
-    shadowColor: '#2B231D',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.09,
-    shadowRadius: 16,
-    elevation: 12,
+  bookCover: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 5,
   },
 } as const;

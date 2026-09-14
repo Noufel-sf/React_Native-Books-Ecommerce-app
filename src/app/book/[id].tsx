@@ -17,20 +17,22 @@ import {
   Star,
   ArrowRight,
   Check,
-  ShoppingBag,
+  Sparkles,
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { BOOKS } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
-import { Typography } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
 
-  // Find the selected book or default to Harry Potter
-  const book = BOOKS.find((b) => b.id === id) ?? BOOKS.find((b) => b.id === 'harry-potter-deathly-hallows') ?? BOOKS[0];
+  const book =
+    BOOKS.find((b) => b.id === id) ??
+    BOOKS.find((b) => b.id === 'concrete-rose') ??
+    BOOKS[0];
 
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
@@ -38,6 +40,14 @@ export default function BookDetailsScreen() {
 
   const [isAdded, setIsAdded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
 
   const handleShare = async () => {
     try {
@@ -49,21 +59,12 @@ export default function BookDetailsScreen() {
     }
   };
 
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)');
-    }
-  };
-
   const handleBuy = () => {
     addItem(book, 'E-Book');
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
   };
 
-  // Rating breakdown percentages (fallback if not defined)
   const breakdown = book.ratingBreakdown ?? {
     5: 85,
     4: 62,
@@ -72,19 +73,29 @@ export default function BookDetailsScreen() {
     1: 6,
   };
 
+  const genreColors = ['#FFDE59', '#C4A1FF', '#2EEC96', '#68B5FF'];
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFDF5" />
 
       {/* Top Navigation Bar */}
       <View style={styles.navBar}>
         <Pressable
           onPress={handleBack}
-          style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.6 : 1 }]}
+          style={({ pressed }) => [
+            styles.iconBtn,
+            {
+              transform: [
+                { translateX: pressed ? 2 : 0 },
+                { translateY: pressed ? 2 : 0 },
+              ],
+            },
+          ]}
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <ArrowLeft size={22} color="#1A1816" strokeWidth={2.2} />
+          <ArrowLeft size={22} color="#000000" strokeWidth={2.8} />
         </Pressable>
 
         <View style={styles.navRightActions}>
@@ -93,25 +104,39 @@ export default function BookDetailsScreen() {
             style={({ pressed }) => [
               styles.bookmarkBadge,
               favorite && styles.bookmarkBadgeActive,
-              { opacity: pressed ? 0.8 : 1 },
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
             ]}
             accessibilityRole="button"
             accessibilityLabel="Bookmark book"
           >
             <Bookmark
-              size={17}
-              color="#FFFFFF"
-              fill="#FFFFFF"
+              size={18}
+              color="#000000"
+              fill={favorite ? '#FF6B4A' : '#000000'}
+              strokeWidth={2}
             />
           </Pressable>
 
           <Pressable
             onPress={handleShare}
-            style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.6 : 1 }]}
+            style={({ pressed }) => [
+              styles.iconBtn,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
             accessibilityRole="button"
             accessibilityLabel="Share book"
           >
-            <Send size={20} color="#1A1816" strokeWidth={2} style={styles.sendIcon} />
+            <Send size={18} color="#000000" strokeWidth={2.5} style={styles.sendIcon} />
           </Pressable>
         </View>
       </View>
@@ -120,14 +145,16 @@ export default function BookDetailsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Book Header Summary: Cover on Left, Info on Right */}
+        {/* Book Header Summary: Big Framed Cover on Left, Info on Right */}
         <View style={styles.heroSection}>
-          <Image
-            source={{ uri: book.coverImage }}
-            style={styles.bookCover}
-            contentFit="cover"
-            transition={200}
-          />
+          <View style={styles.coverFrame}>
+            <Image
+              source={{ uri: book.coverImage }}
+              style={styles.bookCover}
+              contentFit="cover"
+              transition={200}
+            />
+          </View>
 
           <View style={styles.heroInfo}>
             <Text style={styles.title}>{book.title}</Text>
@@ -136,10 +163,16 @@ export default function BookDetailsScreen() {
               Released on {book.releaseDate ?? `Dec. ${book.originalYear ?? 2015}`}
             </Text>
 
-            {/* Genre Pills (2x2 wrap) */}
+            {/* Neobrutalist Genre Sticker Pills */}
             <View style={styles.genresGrid}>
               {book.genres.slice(0, 4).map((genre, idx) => (
-                <View key={idx} style={styles.genrePill}>
+                <View
+                  key={idx}
+                  style={[
+                    styles.genrePill,
+                    { backgroundColor: genreColors[idx % genreColors.length] },
+                  ]}
+                >
                   <Text style={styles.genreText}>{genre}</Text>
                 </View>
               ))}
@@ -147,61 +180,65 @@ export default function BookDetailsScreen() {
           </View>
         </View>
 
-        {/* Key Metrics Row (4 Columns divided by lines) */}
-        <View style={styles.metricsRow}>
+        {/* Key Metrics Row (4 Boxed Stickers with Hard Shadows) */}
+        <View style={styles.metricsContainer}>
           {/* Metric 1: Rating */}
-          <View style={styles.metricItem}>
+          <View style={styles.metricCard}>
             <View style={styles.ratingValueRow}>
               <Text style={styles.metricValue}>{book.rating.toFixed(1)}</Text>
-              <Star size={13} color="#555555" fill="#555555" style={styles.starSmall} />
+              <Star size={13} color="#000000" fill="#FFDE59" />
             </View>
-            <Text style={styles.metricLabel}>{book.reviewsCount > 1000 ? `${(book.reviewsCount / 1000).toFixed(1)}K` : book.reviewsCount} reviews</Text>
+            <Text style={styles.metricLabel}>
+              {book.reviewsCount > 1000
+                ? `${(book.reviewsCount / 1000).toFixed(1)}K`
+                : book.reviewsCount}{' '}
+              reviews
+            </Text>
           </View>
 
-          <View style={styles.metricDivider} />
-
           {/* Metric 2: Size */}
-          <View style={styles.metricItem}>
+          <View style={styles.metricCard}>
             <Text style={styles.metricValue}>{book.fileSize ?? '5.6 MB'}</Text>
             <Text style={styles.metricLabel}>size</Text>
           </View>
 
-          <View style={styles.metricDivider} />
-
           {/* Metric 3: Pages */}
-          <View style={styles.metricItem}>
+          <View style={styles.metricCard}>
             <Text style={styles.metricValue}>{book.pages}</Text>
             <Text style={styles.metricLabel}>pages</Text>
           </View>
 
-          <View style={styles.metricDivider} />
-
           {/* Metric 4: Purchases */}
-          <View style={styles.metricItem}>
+          <View style={styles.metricCard}>
             <Text style={styles.metricValue}>{book.purchasesCount ?? '50M+'}</Text>
             <Text style={styles.metricLabel}>purchases</Text>
           </View>
         </View>
 
-        {/* Buy Action Button */}
+        {/* Big Neobrutal Buy Action Button */}
         <Pressable
           onPress={handleBuy}
           style={({ pressed }) => [
             styles.buyButton,
             isAdded && styles.buyButtonSuccess,
-            { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.985 : 1 }] },
+            {
+              transform: [
+                { translateX: pressed ? 3 : 0 },
+                { translateY: pressed ? 3 : 0 },
+              ],
+            },
           ]}
           accessibilityRole="button"
           accessibilityLabel={`Buy for USD $${book.price.toFixed(2)}`}
         >
           {isAdded ? (
             <View style={styles.buttonInner}>
-              <Check size={20} color="#FFFFFF" strokeWidth={3} />
-              <Text style={styles.buyButtonText}>Added to Cart</Text>
+              <Check size={22} color="#000000" strokeWidth={3} />
+              <Text style={styles.buyButtonText}>ADDED TO CART ✓</Text>
             </View>
           ) : (
             <Text style={styles.buyButtonText}>
-              Buy USD ${book.price.toFixed(2)}
+              BUY USD ${book.price.toFixed(2)}
             </Text>
           )}
         </Pressable>
@@ -212,18 +249,20 @@ export default function BookDetailsScreen() {
           <Pressable
             onPress={() => setIsExpanded(!isExpanded)}
             hitSlop={8}
-            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+            style={styles.arrowButton}
           >
-            <ArrowRight size={18} color="#EA8616" strokeWidth={2.2} />
+            <ArrowRight size={16} color="#000000" strokeWidth={2.5} />
           </Pressable>
         </View>
 
-        <Text
-          style={styles.description}
-          numberOfLines={isExpanded ? undefined : 4}
-        >
-          {book.description}
-        </Text>
+        <View style={styles.contentBox}>
+          <Text
+            style={styles.description}
+            numberOfLines={isExpanded ? undefined : 4}
+          >
+            {book.description}
+          </Text>
+        </View>
 
         {/* Ratings & Reviews Section */}
         <View style={styles.sectionHeader}>
@@ -231,13 +270,13 @@ export default function BookDetailsScreen() {
           <Pressable
             onPress={() => {}}
             hitSlop={8}
-            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+            style={styles.arrowButton}
           >
-            <ArrowRight size={18} color="#EA8616" strokeWidth={2.2} />
+            <ArrowRight size={16} color="#000000" strokeWidth={2.5} />
           </Pressable>
         </View>
 
-        {/* Ratings Breakdown Grid */}
+        {/* Neobrutal Ratings Card */}
         <View style={styles.ratingsCard}>
           {/* Left: Overall Score and Stars */}
           <View style={styles.ratingsLeft}>
@@ -247,14 +286,17 @@ export default function BookDetailsScreen() {
                 <Star
                   key={s}
                   size={15}
-                  color="#EA8616"
-                  fill="#EA8616"
+                  color="#000000"
+                  fill="#FFDE59"
                   style={styles.starIcon}
                 />
               ))}
             </View>
             <Text style={styles.reviewsCountText}>
-              ({book.reviewsCount > 1000 ? `${(book.reviewsCount / 1000).toFixed(1)}k` : book.reviewsCount} reviews)
+              ({book.reviewsCount > 1000
+                ? `${(book.reviewsCount / 1000).toFixed(1)}k`
+                : book.reviewsCount}{' '}
+              reviews)
             </Text>
           </View>
 
@@ -288,7 +330,7 @@ export default function BookDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFDF5',
   },
   navBar: {
     flexDirection: 'row',
@@ -299,23 +341,34 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   iconBtn: {
-    padding: 6,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.sm,
   },
   navRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 12,
   },
   bookmarkBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 7,
-    backgroundColor: '#EA8616',
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#FFDE59',
+    borderWidth: 2.5,
+    borderColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
+    ...Shadows.sm,
   },
   bookmarkBadgeActive: {
-    backgroundColor: '#C94A3D',
+    backgroundColor: '#FF6B4A',
   },
   sendIcon: {
     transform: [{ rotate: '-15deg' }],
@@ -327,18 +380,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: 8,
-    marginBottom: 24,
+    marginBottom: 22,
+  },
+  coverFrame: {
+    width: 148,
+    height: 220,
+    borderRadius: 16,
+    borderWidth: 3,
+    borderColor: '#000000',
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    ...Shadows.card,
   },
   bookCover: {
-    width: 146,
-    height: 218,
-    borderRadius: 16,
-    backgroundColor: '#EBE5D8',
-    shadowColor: '#1A1816',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 8,
+    width: '100%',
+    height: '100%',
   },
   heroInfo: {
     flex: 1,
@@ -346,22 +402,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 21,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
+    fontSize: 22,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     lineHeight: 28,
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
   author: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: Typography.sans.bold,
-    color: '#EA8616',
-    marginTop: 8,
+    color: '#FF6B4A',
+    marginTop: 6,
   },
   releaseDate: {
     fontSize: 11,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
     marginTop: 4,
     marginBottom: 12,
   },
@@ -371,69 +427,64 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   genrePill: {
-    backgroundColor: '#F4F2EE',
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#000000',
   },
   genreText: {
-    fontSize: 11,
-    fontFamily: Typography.sans.medium,
-    color: '#6C6358',
+    fontSize: 10,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    textTransform: 'uppercase',
   },
-  metricsRow: {
+  metricsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#F3EFE6',
+    gap: 8,
     marginBottom: 20,
   },
-  metricItem: {
+  metricCard: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#000000',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
     alignItems: 'center',
+    ...Shadows.sm,
   },
   ratingValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-  },
-  starSmall: {
-    marginTop: -2,
+    gap: 3,
   },
   metricValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: Typography.sans.bold,
-    color: '#1A1816',
+    color: '#000000',
   },
   metricLabel: {
-    fontSize: 11,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
+    fontSize: 10,
+    fontFamily: Typography.sans.bold,
+    color: '#666666',
     marginTop: 3,
-  },
-  metricDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: '#EDE8DE',
+    textTransform: 'uppercase',
   },
   buyButton: {
-    backgroundColor: '#EA8616',
-    height: 52,
-    borderRadius: 26,
+    backgroundColor: '#FFDE59',
+    height: 54,
+    borderRadius: 14,
+    borderWidth: 3,
+    borderColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#EA8616',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 8,
-    elevation: 4,
     marginBottom: 24,
+    ...Shadows.card,
   },
   buyButtonSuccess: {
-    backgroundColor: '#2E7D47',
+    backgroundColor: '#2EEC96',
   },
   buttonInner: {
     flexDirection: 'row',
@@ -441,9 +492,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buyButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
+    color: '#000000',
+    fontSize: 16,
     fontFamily: Typography.sans.bold,
+    letterSpacing: 0.5,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -453,44 +505,68 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 19,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
-    letterSpacing: -0.2,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: -0.3,
+  },
+  arrowButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#FFDE59',
+    borderWidth: 2,
+    borderColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.sm,
+  },
+  contentBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#000000',
+    padding: 14,
+    marginBottom: 22,
+    ...Shadows.card,
   },
   description: {
     fontSize: 13,
     fontFamily: Typography.sans.regular,
     lineHeight: 22,
-    color: '#555555',
-    marginBottom: 24,
+    color: '#222222',
   },
   ratingsCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#000000',
+    padding: 16,
+    ...Shadows.card,
   },
   ratingsLeft: {
     alignItems: 'center',
-    paddingRight: 24,
+    paddingRight: 20,
   },
   scoreLarge: {
-    fontSize: 44,
+    fontSize: 42,
     fontFamily: Typography.sans.bold,
-    color: '#1A1816',
-    lineHeight: 50,
+    color: '#000000',
+    lineHeight: 48,
   },
   starsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
   },
   starIcon: {
     marginRight: 2,
   },
   reviewsCountText: {
-    fontSize: 11,
-    fontFamily: Typography.sans.medium,
-    color: '#8C8276',
+    fontSize: 10,
+    fontFamily: Typography.sans.bold,
+    color: '#666666',
     marginTop: 6,
   },
   ratingsRight: {
@@ -500,24 +576,25 @@ const styles = StyleSheet.create({
   progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   starIndexText: {
     fontSize: 12,
     fontFamily: Typography.sans.bold,
-    color: '#1A1816',
+    color: '#000000',
     width: 10,
   },
   progressBarTrack: {
     flex: 1,
-    height: 4,
-    backgroundColor: '#EBE7DE',
-    borderRadius: 2,
+    height: 7,
+    backgroundColor: '#FAF5EE',
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#000000',
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#EA8616',
-    borderRadius: 2,
+    backgroundColor: '#FFDE59',
   },
 });

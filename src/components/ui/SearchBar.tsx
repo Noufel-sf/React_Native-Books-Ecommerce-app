@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
-import { Colors } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 interface SearchBarProps {
   value: string;
@@ -15,17 +15,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
   onFilterPress,
-  placeholder = 'Search books...',
+  placeholder = 'Search books, authors, genres...',
   autoFocus = false,
 }) => {
   return (
     <View style={styles.container}>
-      <Search size={18} color="#8C8276" style={styles.searchIcon} />
+      <Search size={20} color="#000000" strokeWidth={2.5} style={styles.searchIcon} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#9E9488"
+        placeholderTextColor="#777777"
         style={styles.input}
         autoFocus={autoFocus}
         returnKeyType="search"
@@ -34,12 +34,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         onPress={onFilterPress}
         style={({ pressed }) => [
           styles.filterButton,
-          { opacity: pressed ? 0.75 : 1, transform: [{ scale: pressed ? 0.95 : 1 }] },
+          {
+            transform: [
+              { translateX: pressed ? 1.5 : 0 },
+              { translateY: pressed ? 1.5 : 0 },
+            ],
+          },
         ]}
         accessibilityRole="button"
         accessibilityLabel="Open filters"
       >
-        <SlidersHorizontal size={16} color="#9E651D" />
+        <SlidersHorizontal size={18} color="#000000" strokeWidth={2.5} />
       </Pressable>
     </View>
   );
@@ -50,12 +55,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 9999,
-    paddingLeft: 16,
+    borderRadius: 16,
+    paddingLeft: 14,
     paddingRight: 6,
     paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.card,
   },
   searchIcon: {
     marginRight: 10,
@@ -63,14 +69,17 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 14,
-    color: '#1A1816',
+    fontFamily: Typography.sans.medium,
+    color: '#000000',
     paddingVertical: 6,
   },
   filterButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F5E8D3',
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: '#FFDE59',
+    borderWidth: 2,
+    borderColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
   },

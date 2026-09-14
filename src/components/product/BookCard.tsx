@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Heart } from 'lucide-react-native';
+import { Heart, Star } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
 import { useFavoritesStore } from '@/store/favoritesStore';
-import { Typography } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 interface BookCardProps {
   book: Book;
   width?: number;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ book, width = 148 }) => {
+export const BookCard: React.FC<BookCardProps> = ({ book, width = 156 }) => {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
@@ -29,106 +29,176 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width = 148 }) => {
   };
 
   return (
-    <View style={[styles.cardContainer, { width }]}>
-      {/* Clickable Book Cover */}
+    <View style={[styles.card, { width }]}>
+      {/* Clickable Card Body */}
       <Pressable
         onPress={handleCardPress}
         style={({ pressed }) => [
-          styles.coverPressable,
-          { opacity: pressed ? 0.92 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
+          styles.clickableBody,
+          {
+            transform: [
+              { translateX: pressed ? 2 : 0 },
+              { translateY: pressed ? 2 : 0 },
+            ],
+          },
         ]}
         accessibilityRole="button"
         accessibilityLabel={`View ${book.title}`}
       >
-        <Image
-          source={{ uri: book.coverImage }}
-          style={styles.coverImage}
-          contentFit="cover"
-          transition={200}
-        />
+        {/* Book Cover Frame */}
+        <View style={styles.coverFrame}>
+          <Image
+            source={{ uri: book.coverImage }}
+            style={styles.coverImage}
+            contentFit="cover"
+            transition={200}
+          />
+          {/* Rating tag in bottom left of cover */}
+          <View style={styles.ratingTag}>
+            <Star size={10} color="#000000" fill="#FFDE59" />
+            <Text style={styles.ratingText}>{book.rating.toFixed(1)}</Text>
+          </View>
+        </View>
+
+        {/* Title & Author */}
+        <View style={styles.infoSection}>
+          <Text style={styles.title} numberOfLines={1}>
+            {book.title}
+          </Text>
+          <Text style={styles.author} numberOfLines={1}>
+            {book.author}
+          </Text>
+
+          {/* Price Tag Pill */}
+          <View style={styles.priceRow}>
+            <View style={styles.pricePill}>
+              <Text style={styles.priceText}>${book.price.toFixed(2)}</Text>
+            </View>
+          </View>
+        </View>
       </Pressable>
 
-      {/* Sibling Wishlist Heart Overlay */}
+      {/* Sibling Wishlist Heart Sticker Button */}
       <Pressable
         onPress={handleFavoritePress}
         hitSlop={8}
         style={({ pressed }) => [
           styles.heartBtn,
-          { opacity: pressed ? 0.75 : 1 },
+          favorite && styles.heartBtnActive,
+          {
+            transform: [
+              { translateX: pressed ? 1.5 : 0 },
+              { translateY: pressed ? 1.5 : 0 },
+            ],
+          },
         ]}
         accessibilityRole="button"
         accessibilityLabel="Toggle favorite"
       >
         <Heart
-          size={16}
-          color={favorite ? '#EA8616' : 'rgba(255, 255, 255, 0.9)'}
-          fill={favorite ? '#EA8616' : 'rgba(0, 0, 0, 0.25)'}
+          size={14}
+          color="#000000"
+          fill={favorite ? '#FF6B4A' : '#FFFFFF'}
+          strokeWidth={2.5}
         />
-      </Pressable>
-
-      {/* Book Title & Author directly underneath cover */}
-      <Pressable
-        onPress={handleCardPress}
-        style={styles.infoPressable}
-        accessibilityRole="button"
-      >
-        <Text style={styles.title} numberOfLines={1}>
-          {book.title}
-        </Text>
-        <Text style={styles.author} numberOfLines={1}>
-          {book.author}
-        </Text>
       </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 10,
     marginRight: 16,
+    borderWidth: 2.5,
+    borderColor: '#000000',
     position: 'relative',
+    ...Shadows.card,
   },
-  coverPressable: {
-    borderRadius: 18,
+  clickableBody: {
+    flex: 1,
+  },
+  coverFrame: {
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#000000',
+    position: 'relative',
     backgroundColor: '#FAF5EE',
-    shadowColor: '#1A1816',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 10,
-    elevation: 6,
   },
   coverImage: {
     width: '100%',
-    height: 215,
-    borderRadius: 18,
+    height: 180,
+  },
+  ratingTag: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#000000',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    gap: 3,
+  },
+  ratingText: {
+    fontSize: 10,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   heartBtn: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    top: -6,
+    right: -6,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FFDE59',
+    borderWidth: 2,
+    borderColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    ...Shadows.sm,
   },
-  infoPressable: {
+  heartBtnActive: {
+    backgroundColor: '#FFA6D5',
+  },
+  infoSection: {
     marginTop: 10,
-    paddingHorizontal: 2,
   },
   title: {
     fontSize: 14,
     fontFamily: Typography.sans.bold,
-    color: '#1A1816',
-    lineHeight: 18,
-    letterSpacing: -0.2,
+    color: '#000000',
+    letterSpacing: -0.3,
   },
   author: {
-    fontSize: 12,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
-    marginTop: 3,
+    fontSize: 11,
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
+    marginTop: 2,
+  },
+  priceRow: {
+    marginTop: 8,
+    flexDirection: 'row',
+  },
+  pricePill: {
+    backgroundColor: '#2EEC96',
+    borderWidth: 1.5,
+    borderColor: '#000000',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  priceText: {
+    fontSize: 11,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { ChevronRight } from 'lucide-react-native';
-import { Colors, Typography } from '@/constants/theme';
+import { ArrowUpRight } from 'lucide-react-native';
+import { Shadows, Typography } from '@/constants/theme';
 
 interface SectionHeaderProps {
   title: string;
@@ -20,10 +20,18 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {actionText && (
         <Pressable
           onPress={onActionPress}
-          style={({ pressed }) => [styles.actionButton, { opacity: pressed ? 0.6 : 1 }]}
+          style={({ pressed }) => [
+            styles.actionButton,
+            {
+              transform: [
+                { translateX: pressed ? 1.5 : 0 },
+                { translateY: pressed ? 1.5 : 0 },
+              ],
+            },
+          ]}
         >
           <Text style={styles.actionText}>{actionText}</Text>
-          <ChevronRight size={14} color="#EA8616" style={styles.chevron} />
+          <ArrowUpRight size={14} color="#000000" strokeWidth={2.5} style={styles.icon} />
         </Pressable>
       )}
     </View>
@@ -37,25 +45,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     marginBottom: 14,
-    marginTop: 20,
+    marginTop: 22,
   },
   title: {
-    fontSize: 20,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
-    letterSpacing: -0.3,
+    fontSize: 22,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: -0.5,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
+    backgroundColor: '#FFDE59',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#000000',
+    ...Shadows.sm,
   },
   actionText: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: Typography.sans.bold,
-    color: '#EA8616',
+    color: '#000000',
+    textTransform: 'uppercase',
   },
-  chevron: {
-    marginLeft: 2,
+  icon: {
+    marginLeft: 3,
   },
 });

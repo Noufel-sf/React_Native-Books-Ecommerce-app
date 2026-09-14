@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { GenreCategory } from '@/types/book';
 import { CATEGORIES } from '@/data/categories';
-import { Colors } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 interface CategorySelectorProps {
   selectedCategory: string;
@@ -25,17 +24,25 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           <Pressable
             key={category.id}
             onPress={() => onSelectCategory(category.id)}
-            style={styles.item}
+            style={({ pressed }) => [
+              styles.pill,
+              isSelected ? styles.pillActive : styles.pillInactive,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
           >
             <Text
               style={[
                 styles.categoryText,
-                isSelected ? styles.categoryTextActive : styles.categoryTextInactive,
+                isSelected ? styles.textActive : styles.textInactive,
               ]}
             >
               {category.name}
             </Text>
-            {isSelected && <View style={styles.activeDot} />}
           </Pressable>
         );
       })}
@@ -46,30 +53,32 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: 'center',
-    gap: 20,
+    gap: 10,
   },
-  item: {
-    alignItems: 'center',
-    paddingVertical: 4,
+  pill: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#000000',
+  },
+  pillActive: {
+    backgroundColor: '#FFDE59',
+    ...Shadows.sm,
+  },
+  pillInactive: {
+    backgroundColor: '#FFFFFF',
   },
   categoryText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontFamily: Typography.sans.bold,
   },
-  categoryTextActive: {
-    color: '#1A1816',
-    fontWeight: '700',
+  textActive: {
+    color: '#000000',
   },
-  categoryTextInactive: {
-    color: '#8C8276',
-  },
-  activeDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: '#D48C2B',
-    marginTop: 4,
+  textInactive: {
+    color: '#444444',
   },
 });

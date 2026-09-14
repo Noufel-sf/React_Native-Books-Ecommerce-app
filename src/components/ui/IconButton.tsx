@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 interface IconButtonProps {
   icon: React.ReactNode;
@@ -16,7 +16,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   icon,
   onPress,
   badgeCount,
-  size = 40,
+  size = 42,
   backgroundColor = '#FFFFFF',
   style,
   accessibilityLabel,
@@ -31,10 +31,12 @@ export const IconButton: React.FC<IconButtonProps> = ({
         {
           width: size,
           height: size,
-          borderRadius: size / 2,
+          borderRadius: 12,
           backgroundColor,
-          opacity: pressed ? 0.75 : 1,
-          transform: [{ scale: pressed ? 0.96 : 1 }],
+          transform: [
+            { translateX: pressed ? 2 : 0 },
+            { translateY: pressed ? 2 : 0 },
+          ],
         },
         style,
       ]}
@@ -55,27 +57,28 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
+    borderWidth: 2.5,
+    borderColor: '#000000',
     position: 'relative',
+    ...Shadows.button,
   },
   badge: {
     position: 'absolute',
-    top: -3,
-    right: -3,
-    backgroundColor: '#E24C38',
+    top: -6,
+    right: -6,
+    backgroundColor: '#FF4136',
     borderRadius: 9999,
-    minWidth: 16,
-    height: 16,
+    minWidth: 18,
+    height: 18,
     paddingHorizontal: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000000',
   },
   badgeText: {
     color: '#FFFFFF',
     fontSize: 9,
-    fontWeight: '800',
+    fontFamily: Typography.sans.bold,
   },
 });

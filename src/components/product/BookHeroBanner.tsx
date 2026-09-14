@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { ArrowRight, Sparkles } from 'lucide-react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
-import { BookCover3D } from '@/components/product/BookCover3D';
-import { Colors, Typography } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 interface BookHeroBannerProps {
   book: Book;
@@ -27,15 +27,20 @@ export const BookHeroBanner: React.FC<BookHeroBannerProps> = ({ book }) => {
         onPress={handleBannerPress}
         style={({ pressed }) => [
           styles.bannerCard,
-          { opacity: pressed ? 0.94 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] },
+          {
+            transform: [
+              { translateX: pressed ? 2 : 0 },
+              { translateY: pressed ? 2 : 0 },
+            ],
+          },
         ]}
       >
         {/* Left Column: Details & Call To Action */}
         <View style={styles.leftColumn}>
-          {/* Popular Tag */}
+          {/* Neobrutal Sticker Badge */}
           <View style={styles.popularBadge}>
-            <Sparkles size={11} color="#A86C1D" style={styles.badgeIcon} />
-            <Text style={styles.popularText}>Popular</Text>
+            <Sparkles size={12} color="#000000" style={styles.badgeIcon} />
+            <Text style={styles.popularText}>POPULAR PICK</Text>
           </View>
 
           {/* Book Title */}
@@ -43,43 +48,32 @@ export const BookHeroBanner: React.FC<BookHeroBannerProps> = ({ book }) => {
             {book.title}
           </Text>
 
-          {/* Author & Year */}
+          {/* Author */}
           <Text style={styles.author}>
-            {book.author} {book.originalYear ? `(${book.originalYear})` : ''}
+            by {book.author} {book.originalYear ? `(${book.originalYear})` : ''}
           </Text>
 
-          {/* Read More Action */}
-          <View style={styles.readMoreRow}>
-            <Text style={styles.readMoreText}>Read More...</Text>
-            <ArrowRight size={13} color="#8C5C1E" style={styles.arrowIcon} />
+          {/* Read More Button Sticker */}
+          <View style={styles.readMoreBtn}>
+            <Text style={styles.readMoreText}>EXPLORE NOW</Text>
+            <ArrowRight size={13} color="#000000" strokeWidth={2.5} style={styles.arrowIcon} />
           </View>
         </View>
 
-        {/* Right Column: 3D Stacked Book Cover Perspective */}
+        {/* Right Column: Framed Book Cover with Hard Shadow */}
         <View style={styles.rightColumn}>
-          {/* Background decorative stacked book */}
-          <View style={styles.stackBacking}>
-            <BookCover3D
-              imageUrl={book.coverImage}
-              width={82}
-              height={118}
-              style={{ opacity: 0.55 }}
-            />
-          </View>
-
-          {/* Foreground 3D Book Cover */}
-          <View style={styles.foregroundCover}>
-            <BookCover3D
-              imageUrl={book.coverImage}
-              width={96}
-              height={136}
-              variant="hero"
+          <View style={styles.coverFrame}>
+            <Image
+              source={{ uri: book.coverImage }}
+              style={styles.coverImage}
+              contentFit="cover"
+              transition={200}
             />
           </View>
         </View>
       </Pressable>
 
-      {/* Carousel Dots */}
+      {/* Neobrutal Carousel Dots */}
       <View style={styles.dotsContainer}>
         {[0, 1, 2, 3].map((dotIndex) => (
           <Pressable
@@ -102,15 +96,15 @@ const styles = StyleSheet.create({
     marginVertical: 14,
   },
   bannerCard: {
-    backgroundColor: '#F5ECE0',
-    borderRadius: 24,
+    backgroundColor: '#FFDE59',
+    borderRadius: 20,
     padding: 18,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8DBC9',
-    overflow: 'hidden',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.card,
   },
   leftColumn: {
     flex: 1.1,
@@ -120,81 +114,96 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 9999,
-    marginBottom: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000000',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginBottom: 10,
+    ...Shadows.sm,
   },
   badgeIcon: {
     marginRight: 4,
   },
   popularText: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Typography.sans.bold,
-    color: '#A86C1D',
+    color: '#000000',
+    letterSpacing: 0.5,
   },
   title: {
     fontSize: 18,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
-    lineHeight: 24,
-    letterSpacing: -0.3,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    lineHeight: 23,
+    letterSpacing: -0.4,
   },
   author: {
     fontSize: 12,
     fontFamily: Typography.sans.medium,
-    color: '#7C7368',
+    color: '#333333',
     marginTop: 4,
   },
-  readMoreRow: {
+  readMoreBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 14,
+    ...Shadows.sm,
   },
   readMoreText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: Typography.sans.bold,
-    color: '#9E651D',
+    color: '#000000',
   },
   arrowIcon: {
     marginLeft: 4,
   },
   rightColumn: {
     flex: 0.9,
-    height: 140,
-    position: 'relative',
+    alignItems: 'flex-end',
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  stackBacking: {
-    position: 'absolute',
-    right: 0,
-    top: 4,
-    transform: [{ rotate: '5deg' }],
+  coverFrame: {
+    width: 95,
+    height: 135,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#000000',
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    ...Shadows.button,
   },
-  foregroundCover: {
-    position: 'absolute',
-    right: 14,
-    top: 0,
+  coverImage: {
+    width: '100%',
+    height: '100%',
   },
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
-    gap: 6,
+    marginTop: 12,
+    gap: 8,
   },
   dot: {
-    height: 5,
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#000000',
   },
   activeDot: {
-    width: 18,
-    backgroundColor: '#D48C2B',
+    width: 22,
+    backgroundColor: '#000000',
   },
   inactiveDot: {
-    width: 5,
-    backgroundColor: '#D9D0C3',
+    width: 8,
+    backgroundColor: '#FFFFFF',
   },
 });

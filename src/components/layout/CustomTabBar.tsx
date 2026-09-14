@@ -4,7 +4,7 @@ import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, Compass, BookOpen, User, ShoppingBag } from 'lucide-react-native';
 import { useCartStore } from '@/store/cartStore';
-import { Shadows } from '@/constants/theme';
+import { Shadows, Typography } from '@/constants/theme';
 
 export type CustomTabBarProps = Parameters<
   NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>
@@ -18,26 +18,25 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   const insets = useSafeAreaInsets();
   const totalCartItems = useCartStore((s) => s.getTotalItems());
 
-  // Bottom padding accounts for iPhone Home Indicator and Android navigation
   const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8);
 
   const getTabIcon = (routeName: string, isFocused: boolean) => {
-    const color = isFocused ? '#1A1816' : '#9E9488';
+    const color = isFocused ? '#000000' : '#888888';
     const size = 22;
 
     switch (routeName) {
       case 'index':
-        return <Home size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+        return <Home size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
       case 'explore':
-        return <Compass size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+        return <Compass size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
       case 'cart':
-        return <ShoppingBag size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+        return <ShoppingBag size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
       case 'reading':
-        return <BookOpen size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+        return <BookOpen size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
       case 'profile':
-        return <User size={size} color={color} strokeWidth={isFocused ? 2.4 : 1.8} />;
+        return <User size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
       default:
-        return <Home size={size} color={color} />;
+        return <Home size={size} color={color} strokeWidth={2} />;
     }
   };
 
@@ -50,7 +49,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
       case 'cart':
         return 'Cart';
       case 'reading':
-        return 'Reading';
+        return 'Library';
       case 'profile':
         return 'Profile';
       default:
@@ -62,7 +61,6 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
     <View style={[styles.wrapper, { paddingBottom: bottomPadding }]}>
       <View style={styles.container}>
         {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
           const isFocused = state.index === index;
           const isCenterTab = route.name === 'cart';
 
@@ -78,7 +76,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
             }
           };
 
-          // Elevated Center Button (matching screenshot's gold floating circular action)
+          // Elevated Center Button in Neobrutalist Yellow
           if (isCenterTab) {
             return (
               <View key={route.key} style={styles.centerButtonWrapper}>
@@ -86,12 +84,17 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
                   onPress={onPress}
                   style={({ pressed }) => [
                     styles.centerButton,
-                    { transform: [{ scale: pressed ? 0.94 : 1 }] },
+                    {
+                      transform: [
+                        { translateX: pressed ? 2 : 0 },
+                        { translateY: pressed ? 2 : 0 },
+                      ],
+                    },
                   ]}
                   accessibilityRole="button"
                   accessibilityLabel="Cart"
                 >
-                  <ShoppingBag size={22} color="#FFFFFF" strokeWidth={2.4} />
+                  <ShoppingBag size={24} color="#000000" strokeWidth={2.5} />
                   {totalCartItems > 0 && (
                     <View style={styles.cartBadge}>
                       <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
@@ -136,8 +139,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#EFE7DA',
+    borderTopWidth: 3,
+    borderTopColor: '#000000',
     ...Shadows.floatingBar,
   },
   container: {
@@ -162,53 +165,48 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 10,
     marginTop: 3,
+    fontFamily: Typography.sans.bold,
   },
   tabLabelDefault: {
-    color: '#8C8276',
-    fontWeight: '500',
+    color: '#888888',
   },
   tabLabelFocused: {
-    color: '#1A1816',
-    fontWeight: '700',
+    color: '#000000',
   },
   centerButtonWrapper: {
     width: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    top: -12,
+    top: -14,
   },
   centerButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#D48C2B',
+    width: 54,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: '#FFDE59',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#B8731F',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.38,
-    shadowRadius: 10,
-    elevation: 8,
     borderWidth: 3,
-    borderColor: '#FFFFFF',
+    borderColor: '#000000',
+    ...Shadows.button,
   },
   cartBadge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-    backgroundColor: '#E24C38',
+    top: -5,
+    right: -5,
+    backgroundColor: '#2EEC96',
     borderRadius: 9999,
-    minWidth: 18,
-    height: 18,
+    minWidth: 20,
+    height: 20,
     paddingHorizontal: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000000',
   },
   cartBadgeText: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: Typography.sans.bold,
   },
 });
