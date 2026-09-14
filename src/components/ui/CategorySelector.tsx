@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   pill: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: 0,
     borderWidth: 2,
     borderColor: '#000000',
   },

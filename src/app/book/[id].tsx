@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   iconBtn: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: 0,
     backgroundColor: '#FFFFFF',
     borderWidth: 2.5,
     borderColor: '#000000',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   bookmarkBadge: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: 0,
     backgroundColor: '#FFDE59',
     borderWidth: 2.5,
     borderColor: '#000000',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   coverFrame: {
     width: 148,
     height: 220,
-    borderRadius: 16,
+    borderRadius: 0,
     borderWidth: 3,
     borderColor: '#000000',
     overflow: 'hidden',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   genrePill: {
     paddingHorizontal: 9,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1.5,
     borderColor: '#000000',
   },
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   metricCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 0,
     borderWidth: 2,
     borderColor: '#000000',
     paddingVertical: 10,
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   buyButton: {
     backgroundColor: '#FFDE59',
     height: 54,
-    borderRadius: 14,
+    borderRadius: 0,
     borderWidth: 3,
     borderColor: '#000000',
     justifyContent: 'center',
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   arrowButton: {
     width: 32,
     height: 32,
-    borderRadius: 8,
+    borderRadius: 0,
     backgroundColor: '#FFDE59',
     borderWidth: 2,
     borderColor: '#000000',
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   },
   contentBox: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 0,
     borderWidth: 2,
     borderColor: '#000000',
     padding: 14,
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 0,
     borderWidth: 2,
     borderColor: '#000000',
     padding: 16,
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 7,
     backgroundColor: '#FAF5EE',
-    borderRadius: 4,
+    borderRadius: 0,
     borderWidth: 1.5,
     borderColor: '#000000',
     overflow: 'hidden',

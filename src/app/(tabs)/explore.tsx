@@ -47,7 +47,7 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F5EE',
+    backgroundColor: '#FAF5EE',
   },
   header: {
     paddingHorizontal: 20,
@@ -56,14 +56,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
     marginTop: 4,
     marginBottom: 16,
   },

@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFDE59',
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 2,
     borderColor: '#000000',
     ...Shadows.sm,

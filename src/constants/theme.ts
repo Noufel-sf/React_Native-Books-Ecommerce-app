@@ -64,12 +64,12 @@ export const Spacing = {
 } as const;
 
 export const BorderRadius = {
-  sm: 6,
-  md: 10,
-  lg: 14,
-  xl: 18,
-  '2xl': 24,
-  full: 9999,
+  sm: 0,
+  md: 0,
+  lg: 0,
+  xl: 0,
+  '2xl': 0,
+  full: 0,
 } as const;
 
 // Signature Neobrutalist Hard Black Drop Shadows (No blur, crisp offset)

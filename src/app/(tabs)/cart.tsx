@@ -5,7 +5,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react-nativ
 import { Image } from 'expo-image';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'expo-router';
-import { Typography } from '@/constants/theme';
+import { Typography, Shadows } from '@/constants/theme';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function CartScreen() {
       {items.length === 0 ? (
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconCircle}>
-            <ShoppingBag size={36} color="#A86C1D" />
+            <ShoppingBag size={36} color="#000000" />
           </View>
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
           <Text style={styles.emptySubtitle}>Explore our catalog and find your next favorite read.</Text>
@@ -56,9 +56,9 @@ export default function CartScreen() {
                     style={styles.qtyBtn}
                   >
                     {item.quantity === 1 ? (
-                      <Trash2 size={13} color="#C94A3D" />
+                      <Trash2 size={13} color="#FF6B4A" />
                     ) : (
-                      <Minus size={13} color="#1A1816" />
+                      <Minus size={13} color="#000000" />
                     )}
                   </Pressable>
                   <Text style={styles.qtyNumber}>{item.quantity}</Text>
@@ -66,7 +66,7 @@ export default function CartScreen() {
                     onPress={() => updateQuantity(item.id, item.quantity + 1)}
                     style={styles.qtyBtn}
                   >
-                    <Plus size={13} color="#1A1816" />
+                    <Plus size={13} color="#000000" />
                   </Pressable>
                 </View>
               </View>
@@ -94,7 +94,7 @@ export default function CartScreen() {
               style={({ pressed }) => [styles.checkoutBtn, { opacity: pressed ? 0.9 : 1 }]}
             >
               <Text style={styles.checkoutText}>Proceed to Checkout</Text>
-              <ArrowRight size={16} color="#FFFFFF" />
+              <ArrowRight size={16} color="#000000" />
             </Pressable>
           </View>
         </View>
@@ -106,7 +106,7 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F5EE',
+    backgroundColor: '#FAF5EE',
   },
   header: {
     paddingHorizontal: 20,
@@ -115,13 +115,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
     marginTop: 2,
   },
   content: {
@@ -135,16 +136,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 0,
     padding: 12,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.card,
   },
   thumbnail: {
     width: 55,
     height: 75,
-    borderRadius: 6,
+    borderRadius: 0,
+    borderWidth: 2,
+    borderColor: '#000000',
     backgroundColor: '#ECE5D8',
   },
   cardDetails: {
@@ -153,51 +157,52 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   itemFormat: {
     fontSize: 11,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
     marginTop: 2,
   },
   itemPrice: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#B87826',
+    fontFamily: Typography.sans.bold,
+    color: '#FF6B4A',
     marginTop: 6,
   },
   qtyControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAF6EE',
-    borderRadius: 9999,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 0,
     paddingHorizontal: 4,
     paddingVertical: 2,
-    borderWidth: 1,
-    borderColor: '#E8DFC9',
+    borderWidth: 2,
+    borderColor: '#000000',
   },
   qtyBtn: {
     width: 26,
     height: 26,
-    borderRadius: 13,
+    borderRadius: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   qtyNumber: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     paddingHorizontal: 6,
   },
   summaryCard: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     padding: 20,
     paddingBottom: 100,
-    borderTopWidth: 1,
-    borderTopColor: '#ECE5D8',
+    borderTopWidth: 3,
+    borderColor: '#000000',
   },
   summaryRow: {
     flexDirection: 'row',
@@ -206,43 +211,47 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 13,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
   },
   summaryValue: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   totalRow: {
-    borderTopWidth: 1,
-    borderTopColor: '#F0EBE1',
-    paddingTop: 10,
+    borderTopWidth: 2,
+    borderTopColor: '#000000',
+    paddingTop: 12,
     marginTop: 4,
     marginBottom: 16,
   },
   totalLabel: {
     fontSize: 16,
-    fontWeight: '800',
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   totalValue: {
     fontSize: 18,
-    fontWeight: '800',
-    color: '#B87826',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   checkoutBtn: {
-    backgroundColor: '#D48C2B',
-    borderRadius: 16,
+    backgroundColor: '#FFDE59',
+    borderRadius: 0,
     paddingVertical: 14,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2.5,
+    borderColor: '#000000',
     gap: 8,
+    ...Shadows.button,
   },
   checkoutText: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
   },
   emptyContainer: {
     flex: 1,
@@ -254,33 +263,40 @@ const styles = StyleSheet.create({
   emptyIconCircle: {
     width: 72,
     height: 72,
-    borderRadius: 36,
-    backgroundColor: '#FAF1E3',
+    borderRadius: 0,
+    backgroundColor: '#FFDE59',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.card,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   emptySubtitle: {
     fontSize: 13,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
     textAlign: 'center',
     marginTop: 6,
     marginBottom: 20,
   },
   exploreBtn: {
-    backgroundColor: '#1A1816',
+    backgroundColor: '#FFDE59',
     paddingHorizontal: 22,
     paddingVertical: 12,
-    borderRadius: 9999,
+    borderRadius: 0,
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.button,
   },
   exploreBtnText: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
   },
 });

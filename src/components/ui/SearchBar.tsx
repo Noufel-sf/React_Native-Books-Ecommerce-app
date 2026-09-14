@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 0,
     paddingLeft: 14,
     paddingRight: 6,
     paddingVertical: 6,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   filterButton: {
     width: 38,
     height: 38,
-    borderRadius: 10,
+    borderRadius: 0,
     backgroundColor: '#FFDE59',
     borderWidth: 2,
     borderColor: '#000000',

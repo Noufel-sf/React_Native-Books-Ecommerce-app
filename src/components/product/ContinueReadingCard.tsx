@@ -118,7 +118,7 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 0,
     padding: 12,
     marginHorizontal: 20,
     marginBottom: 14,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   coverFrame: {
     width: 72,
     height: 100,
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 2,
     borderColor: '#000000',
     overflow: 'hidden',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
     borderColor: '#000000',
-    borderRadius: 6,
+    borderRadius: 0,
     paddingHorizontal: 6,
     paddingVertical: 2,
     gap: 3,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   progressBarBackground: {
     height: 8,
     backgroundColor: '#F0EBE0',
-    borderRadius: 4,
+    borderRadius: 0,
     borderWidth: 1.5,
     borderColor: '#000000',
     overflow: 'hidden',
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     right: -6,
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: 0,
     backgroundColor: '#FFDE59',
     borderWidth: 2,
     borderColor: '#000000',

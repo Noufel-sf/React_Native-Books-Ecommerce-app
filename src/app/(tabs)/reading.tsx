@@ -5,7 +5,7 @@ import { BookCard } from '@/components/product/BookCard';
 import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
 import { BOOKS, CONTINUE_READING_BOOKS } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
-import { Typography } from '@/constants/theme';
+import { Typography, Shadows } from '@/constants/theme';
 
 export default function ReadingScreen() {
   const [activeTab, setActiveTab] = useState<'reading' | 'favorites'>('reading');
@@ -15,7 +15,7 @@ export default function ReadingScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F5EE" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FAF5EE" />
       <View style={styles.header}>
         <Text style={styles.title}>My Library</Text>
         <Text style={styles.subtitle}>Track your ongoing books and saved wishlist</Text>
@@ -69,7 +69,7 @@ export default function ReadingScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F5EE',
+    backgroundColor: '#FAF5EE',
   },
   header: {
     paddingHorizontal: 20,
@@ -78,44 +78,45 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: Typography.serif.bold,
-    color: '#1A1816',
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
-    color: '#8C8276',
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
     marginTop: 2,
     marginBottom: 14,
   },
   tabToggle: {
     flexDirection: 'row',
-    backgroundColor: '#EFEAE0',
-    borderRadius: 9999,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 0,
+    borderWidth: 2.5,
+    borderColor: '#000000',
     padding: 3,
+    ...Shadows.sm,
   },
   toggleBtn: {
     flex: 1,
     paddingVertical: 8,
     alignItems: 'center',
-    borderRadius: 9999,
+    borderRadius: 0,
   },
   toggleBtnActive: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
+    backgroundColor: '#FFDE59',
+    borderWidth: 1.5,
+    borderColor: '#000000',
   },
   toggleText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#7C7266',
+    fontFamily: Typography.sans.medium,
+    color: '#555555',
   },
   toggleTextActive: {
-    color: '#1A1816',
-    fontWeight: '700',
+    color: '#000000',
+    fontFamily: Typography.sans.bold,
   },
   listContent: {
     paddingBottom: 100,

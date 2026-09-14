@@ -31,7 +31,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         {
           width: size,
           height: size,
-          borderRadius: 12,
+          borderRadius: 0,
           backgroundColor,
           transform: [
             { translateX: pressed ? 2 : 0 },
@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2.5,
     borderColor: '#000000',
+    borderRadius: 0,
     position: 'relative',
     ...Shadows.button,
   },
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     top: -6,
     right: -6,
     backgroundColor: '#FF4136',
-    borderRadius: 9999,
+    borderRadius: 0,
     minWidth: 18,
     height: 18,
     paddingHorizontal: 4,
