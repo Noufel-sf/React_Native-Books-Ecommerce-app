@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   StatusBar,
   Share,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -24,6 +25,7 @@ import { BOOKS } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
 import { Shadows, Typography } from '@/constants/theme';
+import { BookCard } from '@/components/product/BookCard';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -40,6 +42,17 @@ export default function BookDetailsScreen() {
 
   const [isAdded, setIsAdded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const suggestedBooks = useMemo(() => {
+    if (!book) return [];
+    const related = BOOKS.filter(
+      (b) => b.id !== book.id && b.genres.some((g) => book.genres.includes(g))
+    );
+    const others = BOOKS.filter(
+      (b) => b.id !== book.id && !b.genres.some((g) => book.genres.includes(g))
+    );
+    return [...related, ...others];
+  }, [book]);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -321,6 +334,34 @@ export default function BookDetailsScreen() {
           </View>
         </View>
 
+        {/* Suggested Books / Similar Reads Section */}
+        {suggestedBooks.length > 0 && (
+          <>
+            <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+              <Text style={styles.sectionTitle}>You May Also Like</Text>
+              <Pressable
+                onPress={() => router.push('/(tabs)/explore')}
+                hitSlop={8}
+                style={styles.arrowButton}
+                accessibilityRole="button"
+                accessibilityLabel="View all suggestions"
+              >
+                <ArrowRight size={16} color="#000000" strokeWidth={2.5} />
+              </Pressable>
+            </View>
+
+            <FlatList
+              horizontal
+              data={suggestedBooks}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <BookCard book={item} width={168} />}
+              showsHorizontalScrollIndicator={false}
+              style={styles.suggestedListWrapper}
+              contentContainerStyle={styles.suggestedListContent}
+            />
+          </>
+        )}
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
@@ -596,5 +637,14 @@ const styles = StyleSheet.create({
   progressBarFill: {
     height: '100%',
     backgroundColor: '#FFDE59',
+  },
+  suggestedListWrapper: {
+    marginHorizontal: -20,
+    marginBottom: 8,
+  },
+  suggestedListContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    gap: 12,
   },
 });
