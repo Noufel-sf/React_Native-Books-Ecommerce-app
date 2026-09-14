@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "temp_probe",
-    "slug": "temp_probe",
+    "name": "Lumina Books",
+    "slug": "lumina-books",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tempprobe",
+    "scheme": "luminabooks",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
