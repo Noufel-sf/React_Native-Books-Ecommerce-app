@@ -25,6 +25,10 @@ export interface Book {
   publisher: string;
   isbn: string;
   inStock: boolean;
+  fileSize?: string;
+  purchasesCount?: string;
+  releaseDate?: string;
+  ratingBreakdown?: { 5: number; 4: number; 3: number; 2: number; 1: number };
   readingProgress?: number; // 0 - 100%
   currentPage?: number;
 }

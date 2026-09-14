@@ -11,41 +11,33 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  ChevronLeft,
-  Share2,
-  Heart,
-  Star,
-  ShoppingBag,
-  Check,
-  Volume2,
-  Play,
-  Pause,
-  ChevronRight,
-  BookOpen,
+  ArrowLeft,
   Bookmark,
+  Send,
+  Star,
+  ArrowRight,
+  Check,
+  ShoppingBag,
 } from 'lucide-react-native';
+import { Image } from 'expo-image';
 import { BOOKS } from '@/data/books';
-import { BookCover3D } from '@/components/product/BookCover3D';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
-import { BookFormat } from '@/types/book';
 import { Typography } from '@/constants/theme';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const book = BOOKS.find((b) => b.id === id) ?? BOOKS[0];
+
+  // Find the selected book or default to Harry Potter
+  const book = BOOKS.find((b) => b.id === id) ?? BOOKS.find((b) => b.id === 'harry-potter-deathly-hallows') ?? BOOKS[0];
 
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
   const addItem = useCartStore((s) => s.addItem);
 
-  const [selectedFormat, setSelectedFormat] = useState<BookFormat>(
-    book.availableFormats[0] ?? 'Hardcover'
-  );
   const [isAdded, setIsAdded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [page, setPage] = useState(2);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleShare = async () => {
     try {
@@ -57,232 +49,230 @@ export default function BookDetailsScreen() {
     }
   };
 
-  const handleAddToCart = () => {
-    addItem(book, selectedFormat);
+  const handleBuy = () => {
+    addItem(book, 'E-Book');
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1800);
+    setTimeout(() => setIsAdded(false), 2000);
+  };
+
+  // Rating breakdown percentages (fallback if not defined)
+  const breakdown = book.ratingBreakdown ?? {
+    5: 85,
+    4: 62,
+    3: 18,
+    2: 24,
+    1: 6,
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F5EE" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Top Navigation Bar */}
-      <View style={styles.topBar}>
+      <View style={styles.navBar}>
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.navBtn, { opacity: pressed ? 0.7 : 1 }]}
+          style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.6 : 1 }]}
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="Go back"
         >
-          <ChevronLeft size={22} color="#1A1816" />
+          <ArrowLeft size={22} color="#1A1816" strokeWidth={2.2} />
         </Pressable>
 
-        <View style={styles.topRightActions}>
+        <View style={styles.navRightActions}>
           <Pressable
             onPress={() => toggleFavorite(book.id)}
-            style={({ pressed }) => [styles.navBtn, { opacity: pressed ? 0.7 : 1 }]}
+            style={({ pressed }) => [
+              styles.bookmarkBadge,
+              favorite && styles.bookmarkBadgeActive,
+              { opacity: pressed ? 0.8 : 1 },
+            ]}
             accessibilityRole="button"
-            accessibilityLabel="Save to wishlist"
+            accessibilityLabel="Bookmark book"
           >
-            <Heart
-              size={20}
-              color={favorite ? '#C94A3D' : '#1A1816'}
-              fill={favorite ? '#C94A3D' : 'transparent'}
+            <Bookmark
+              size={17}
+              color="#FFFFFF"
+              fill="#FFFFFF"
             />
           </Pressable>
+
           <Pressable
             onPress={handleShare}
-            style={({ pressed }) => [styles.navBtn, { opacity: pressed ? 0.7 : 1 }]}
+            style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.6 : 1 }]}
             accessibilityRole="button"
             accessibilityLabel="Share book"
           >
-            <Share2 size={20} color="#1A1816" />
+            <Send size={20} color="#1A1816" strokeWidth={2} style={styles.sendIcon} />
           </Pressable>
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Main Cover Section with Volume Slider (Matching Reference Image) */}
-        <View style={styles.heroRow}>
-          {/* Vertical Volume Slider on Left (from reference design) */}
-          <View style={styles.volumeColumn}>
-            <View style={styles.volumeTrack}>
-              <View style={styles.volumeThumb} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Book Header Summary: Cover on Left, Info on Right */}
+        <View style={styles.heroSection}>
+          <Image
+            source={{ uri: book.coverImage }}
+            style={styles.bookCover}
+            contentFit="cover"
+            transition={200}
+          />
+
+          <View style={styles.heroInfo}>
+            <Text style={styles.title}>{book.title}</Text>
+            <Text style={styles.author}>{book.author}</Text>
+            <Text style={styles.releaseDate}>
+              Released on {book.releaseDate ?? `Dec. ${book.originalYear ?? 2015}`}
+            </Text>
+
+            {/* Genre Pills (2x2 wrap) */}
+            <View style={styles.genresGrid}>
+              {book.genres.slice(0, 4).map((genre, idx) => (
+                <View key={idx} style={styles.genrePill}>
+                  <Text style={styles.genreText}>{genre}</Text>
+                </View>
+              ))}
             </View>
-            <Volume2 size={16} color="#A86C1D" style={{ marginTop: 8 }} />
           </View>
-
-          {/* 3D Book Cover Centerpiece */}
-          <View style={styles.coverCenter}>
-            <BookCover3D
-              imageUrl={book.coverImage}
-              width={160}
-              height={230}
-              variant="hero"
-            />
-          </View>
-
-          {/* Balance spacer on right */}
-          <View style={{ width: 28 }} />
         </View>
 
-        {/* Title & Author */}
-        <View style={styles.headerSection}>
-          <Text style={styles.title}>{book.title}</Text>
-          <Text style={styles.author}>by {book.author}</Text>
-          {book.subtitle && <Text style={styles.subtitle}>{book.subtitle}</Text>}
-        </View>
-
-        {/* Stats Row (Rating, Number of Page, Language, Audio) */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <View style={styles.statValueRow}>
-              <Star size={13} color="#D48C2B" fill="#D48C2B" />
-              <Text style={styles.statValue}>{book.rating.toFixed(1)}</Text>
+        {/* Key Metrics Row (4 Columns divided by lines) */}
+        <View style={styles.metricsRow}>
+          {/* Metric 1: Rating */}
+          <View style={styles.metricItem}>
+            <View style={styles.ratingValueRow}>
+              <Text style={styles.metricValue}>{book.rating.toFixed(1)}</Text>
+              <Star size={13} color="#555555" fill="#555555" style={styles.starSmall} />
             </View>
-            <Text style={styles.statLabel}>Rating</Text>
+            <Text style={styles.metricLabel}>{book.reviewsCount > 1000 ? `${(book.reviewsCount / 1000).toFixed(1)}K` : book.reviewsCount} reviews</Text>
           </View>
 
-          <View style={styles.statDivider} />
+          <View style={styles.metricDivider} />
 
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{book.pages}</Text>
-            <Text style={styles.statLabel}>Number Of Page</Text>
+          {/* Metric 2: Size */}
+          <View style={styles.metricItem}>
+            <Text style={styles.metricValue}>{book.fileSize ?? '5.6 MB'}</Text>
+            <Text style={styles.metricLabel}>size</Text>
           </View>
 
-          <View style={styles.statDivider} />
+          <View style={styles.metricDivider} />
 
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{book.language.slice(0, 3)}</Text>
-            <Text style={styles.statLabel}>Language</Text>
+          {/* Metric 3: Pages */}
+          <View style={styles.metricItem}>
+            <Text style={styles.metricValue}>{book.pages}</Text>
+            <Text style={styles.metricLabel}>pages</Text>
           </View>
 
-          <View style={styles.statDivider} />
+          <View style={styles.metricDivider} />
 
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{book.audioLength ?? '2h30m'}</Text>
-            <Text style={styles.statLabel}>Audio</Text>
+          {/* Metric 4: Purchases */}
+          <View style={styles.metricItem}>
+            <Text style={styles.metricValue}>{book.purchasesCount ?? '50M+'}</Text>
+            <Text style={styles.metricLabel}>purchases</Text>
           </View>
         </View>
 
-        {/* Available Formats Selector */}
-        <View style={styles.formatSection}>
-          <Text style={styles.sectionTitle}>Select Format</Text>
-          <View style={styles.formatPillsRow}>
-            {book.availableFormats.map((format) => {
-              const isSelected = selectedFormat === format;
+        {/* Buy Action Button */}
+        <Pressable
+          onPress={handleBuy}
+          style={({ pressed }) => [
+            styles.buyButton,
+            isAdded && styles.buyButtonSuccess,
+            { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.985 : 1 }] },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={`Buy for USD $${book.price.toFixed(2)}`}
+        >
+          {isAdded ? (
+            <View style={styles.buttonInner}>
+              <Check size={20} color="#FFFFFF" strokeWidth={3} />
+              <Text style={styles.buyButtonText}>Added to Cart</Text>
+            </View>
+          ) : (
+            <Text style={styles.buyButtonText}>
+              Buy USD ${book.price.toFixed(2)}
+            </Text>
+          )}
+        </Pressable>
+
+        {/* About this Ebook Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>About this Ebook</Text>
+          <Pressable
+            onPress={() => setIsExpanded(!isExpanded)}
+            hitSlop={8}
+            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+          >
+            <ArrowRight size={18} color="#EA8616" strokeWidth={2.2} />
+          </Pressable>
+        </View>
+
+        <Text
+          style={styles.description}
+          numberOfLines={isExpanded ? undefined : 4}
+        >
+          {book.description}
+        </Text>
+
+        {/* Ratings & Reviews Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Ratings & Reviews</Text>
+          <Pressable
+            onPress={() => {}}
+            hitSlop={8}
+            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+          >
+            <ArrowRight size={18} color="#EA8616" strokeWidth={2.2} />
+          </Pressable>
+        </View>
+
+        {/* Ratings Breakdown Grid */}
+        <View style={styles.ratingsCard}>
+          {/* Left: Overall Score and Stars */}
+          <View style={styles.ratingsLeft}>
+            <Text style={styles.scoreLarge}>{book.rating.toFixed(1)}</Text>
+            <View style={styles.starsRow}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  size={15}
+                  color="#EA8616"
+                  fill="#EA8616"
+                  style={styles.starIcon}
+                />
+              ))}
+            </View>
+            <Text style={styles.reviewsCountText}>
+              ({book.reviewsCount > 1000 ? `${(book.reviewsCount / 1000).toFixed(1)}k` : book.reviewsCount} reviews)
+            </Text>
+          </View>
+
+          {/* Right: 5-to-1 Star Progress Bars */}
+          <View style={styles.ratingsRight}>
+            {[5, 4, 3, 2, 1].map((ratingNum) => {
+              const fillPercentage = (breakdown as any)[ratingNum] ?? 10;
               return (
-                <Pressable
-                  key={format}
-                  onPress={() => setSelectedFormat(format)}
-                  style={[
-                    styles.formatPill,
-                    isSelected && styles.formatPillSelected,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.formatPillText,
-                      isSelected && styles.formatPillTextSelected,
-                    ]}
-                  >
-                    {format}
-                  </Text>
-                </Pressable>
+                <View key={ratingNum} style={styles.progressRow}>
+                  <Text style={styles.starIndexText}>{ratingNum}</Text>
+                  <View style={styles.progressBarTrack}>
+                    <View
+                      style={[
+                        styles.progressBarFill,
+                        { width: `${fillPercentage}%` },
+                      ]}
+                    />
+                  </View>
+                </View>
               );
             })}
           </View>
         </View>
 
-        {/* Editorial Borzoi Card (from reference design) */}
-        <View style={styles.editorialCard}>
-          <Text style={styles.borzoiHeading}>THIS IS A BORZOI BOOK</Text>
-          <Text style={styles.publisherName}>PUBLISHED BY {book.publisher.toUpperCase()}</Text>
-          <View style={styles.cardDivider} />
-          <Text style={styles.copyrightText}>© {book.originalYear ?? 1992} by {book.author}</Text>
-          <Text style={styles.descriptionText}>{book.description}</Text>
-          <View style={styles.isbnRow}>
-            <Text style={styles.isbnText}>eISBN: {book.isbn}</Text>
-          </View>
-        </View>
-
-        {/* Audio Player & Reader Controller (from reference design) */}
-        <View style={styles.audioPlayerCard}>
-          <View style={styles.audioProgressRow}>
-            <Pressable
-              onPress={() => setIsPlaying(!isPlaying)}
-              style={styles.playPauseBtn}
-            >
-              {isPlaying ? (
-                <Pause size={16} color="#1A1816" />
-              ) : (
-                <Play size={16} color="#1A1816" fill="#1A1816" />
-              )}
-            </Pressable>
-            <View style={styles.audioProgressBar}>
-              <View style={[styles.audioProgressFill, { width: '38%' }]} />
-              <View style={styles.audioKnob} />
-            </View>
-            <Text style={styles.audioTime}>-2h12m</Text>
-          </View>
-
-          {/* Reader Pagination & Chapter Controls */}
-          <View style={styles.pageControlsRow}>
-            <BookOpen size={18} color="#8C8276" />
-            <View style={styles.pagePill}>
-              <Pressable
-                onPress={() => setPage(Math.max(1, page - 1))}
-                hitSlop={8}
-              >
-                <ChevronLeft size={16} color="#FFFFFF" />
-              </Pressable>
-              <Text style={styles.pageText}>
-                {page} / {book.pages}
-              </Text>
-              <Pressable
-                onPress={() => setPage(Math.min(book.pages, page + 1))}
-                hitSlop={8}
-              >
-                <ChevronRight size={16} color="#FFFFFF" />
-              </Pressable>
-            </View>
-            <Bookmark size={18} color="#8C8276" />
-          </View>
-        </View>
-
-        <View style={{ height: 110 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
-
-      {/* Floating Bottom Add-To-Cart Bar */}
-      <View style={styles.bottomBar}>
-        <View style={styles.priceContainer}>
-          <Text style={styles.priceLabel}>Price</Text>
-          <Text style={styles.priceValue}>${book.price.toFixed(2)}</Text>
-        </View>
-        <Pressable
-          onPress={handleAddToCart}
-          style={({ pressed }) => [
-            styles.addToCartBtn,
-            isAdded && styles.addedBtn,
-            { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel="Add book to cart"
-        >
-          {isAdded ? (
-            <>
-              <Check size={18} color="#FFFFFF" strokeWidth={3} />
-              <Text style={styles.addToCartText}>Added to Cart</Text>
-            </>
-          ) : (
-            <>
-              <ShoppingBag size={18} color="#FFFFFF" />
-              <Text style={styles.addToCartText}>Add to Cart • ${book.price.toFixed(2)}</Text>
-            </>
-          )}
-        </Pressable>
-      </View>
     </SafeAreaView>
   );
 }
@@ -290,327 +280,235 @@ export default function BookDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F5EE',
+    backgroundColor: '#FFFFFF',
   },
-  topBar: {
+  navBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
-  navBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
+  iconBtn: {
+    padding: 6,
+  },
+  navRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  bookmarkBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 7,
+    backgroundColor: '#EA8616',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  topRightActions: {
-    flexDirection: 'row',
-    gap: 10,
+  bookmarkBadgeActive: {
+    backgroundColor: '#C94A3D',
+  },
+  sendIcon: {
+    transform: [{ rotate: '-15deg' }],
   },
   scrollContent: {
     paddingHorizontal: 20,
   },
-  heroRow: {
+  heroSection: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 6,
-    marginBottom: 20,
+    alignItems: 'flex-start',
+    marginTop: 8,
+    marginBottom: 24,
   },
-  volumeColumn: {
-    alignItems: 'center',
-    width: 28,
+  bookCover: {
+    width: 120,
+    height: 172,
+    borderRadius: 14,
+    backgroundColor: '#EBE5D8',
+    shadowColor: '#1A1816',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  volumeTrack: {
-    width: 4,
-    height: 80,
-    backgroundColor: '#EBE2D3',
-    borderRadius: 2,
-    position: 'relative',
-    alignItems: 'center',
-  },
-  volumeThumb: {
-    position: 'absolute',
-    top: 32,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#D48C2B',
-  },
-  coverCenter: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: 20,
+  heroInfo: {
+    flex: 1,
+    marginLeft: 18,
   },
   title: {
-    fontSize: 24,
-    fontFamily: Typography.serif.bold,
+    fontSize: 20,
+    fontFamily: Typography.sans.bold,
     color: '#1A1816',
-    textAlign: 'center',
+    lineHeight: 26,
     letterSpacing: -0.3,
   },
   author: {
-    fontSize: 14,
-    fontFamily: Typography.sans.medium,
-    color: '#7C7368',
-    marginTop: 4,
+    fontSize: 13,
+    fontFamily: Typography.sans.bold,
+    color: '#EA8616',
+    marginTop: 8,
   },
-  subtitle: {
-    fontSize: 12,
+  releaseDate: {
+    fontSize: 11,
     fontFamily: Typography.sans.regular,
-    color: '#9E9488',
+    color: '#8C8276',
     marginTop: 4,
-    fontStyle: 'italic',
+    marginBottom: 10,
   },
-  statsContainer: {
+  genresGrid: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
-    marginBottom: 20,
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
   },
-  statItem: {
+  genrePill: {
+    backgroundColor: '#F4F2EE',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  genreText: {
+    fontSize: 11,
+    fontFamily: Typography.sans.medium,
+    color: '#6C6358',
+  },
+  metricsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#F3EFE6',
+    marginBottom: 20,
+  },
+  metricItem: {
     flex: 1,
     alignItems: 'center',
   },
-  statValueRow: {
+  ratingValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  statValue: {
-    fontSize: 14,
+  starSmall: {
+    marginTop: -2,
+  },
+  metricValue: {
+    fontSize: 15,
     fontFamily: Typography.sans.bold,
     color: '#1A1816',
   },
-  statLabel: {
-    fontSize: 10,
+  metricLabel: {
+    fontSize: 11,
     fontFamily: Typography.sans.regular,
     color: '#8C8276',
     marginTop: 3,
-    textAlign: 'center',
   },
-  statDivider: {
+  metricDivider: {
     width: 1,
-    height: 24,
-    backgroundColor: '#EFEAE0',
+    height: 28,
+    backgroundColor: '#EDE8DE',
   },
-  formatSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontFamily: Typography.sans.bold,
-    color: '#1A1816',
-    marginBottom: 10,
-  },
-  formatPillsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  formatPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 9999,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
-  },
-  formatPillSelected: {
-    backgroundColor: '#1A1816',
-    borderColor: '#1A1816',
-  },
-  formatPillText: {
-    fontSize: 12,
-    fontFamily: Typography.sans.medium,
-    color: '#6B6258',
-  },
-  formatPillTextSelected: {
-    color: '#FFFFFF',
-    fontFamily: Typography.sans.bold,
-  },
-  editorialCard: {
-    backgroundColor: '#FAF7F0',
-    borderRadius: 20,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: '#E8DEC9',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  borzoiHeading: {
-    fontSize: 12,
-    fontFamily: Typography.serif.bold,
-    letterSpacing: 1.5,
-    color: '#705F4D',
-    marginBottom: 4,
-  },
-  publisherName: {
-    fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#2A231C',
-    letterSpacing: 0.8,
-  },
-  cardDivider: {
-    width: 60,
-    height: 1,
-    backgroundColor: '#D9CEBD',
-    marginVertical: 12,
-  },
-  copyrightText: {
-    fontSize: 11,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
-    marginBottom: 8,
-  },
-  descriptionText: {
-    fontSize: 13,
-    fontFamily: Typography.serif.semiBold,
-    lineHeight: 20,
-    color: '#463F38',
-    textAlign: 'center',
-  },
-  isbnRow: {
-    marginTop: 14,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#EBE2D3',
-    width: '100%',
-    alignItems: 'center',
-  },
-  isbnText: {
-    fontSize: 11,
-    fontFamily: Typography.sans.medium,
-    color: '#8C8276',
-  },
-  audioPlayerCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#ECE5D8',
-    marginBottom: 20,
-  },
-  audioProgressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  playPauseBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F8F5EE',
+  buyButton: {
+    backgroundColor: '#EA8616',
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#EA8616',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
+    elevation: 4,
+    marginBottom: 24,
   },
-  audioProgressBar: {
-    flex: 1,
-    height: 4,
-    backgroundColor: '#EBE2D3',
-    borderRadius: 2,
-    position: 'relative',
-    justifyContent: 'center',
+  buyButtonSuccess: {
+    backgroundColor: '#2E7D47',
   },
-  audioProgressFill: {
-    height: '100%',
-    backgroundColor: '#D48C2B',
-    borderRadius: 2,
-  },
-  audioKnob: {
-    position: 'absolute',
-    left: '37%',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#D48C2B',
-  },
-  audioTime: {
-    fontSize: 11,
-    fontFamily: Typography.sans.medium,
-    color: '#8C8276',
-  },
-  pageControlsRow: {
+  buttonInner: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 14,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F3EFE6',
-  },
-  pagePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1A1816',
-    borderRadius: 9999,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    gap: 12,
-  },
-  pageText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontFamily: Typography.sans.bold,
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#ECE5D8',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  priceContainer: {
-    justifyContent: 'center',
-  },
-  priceLabel: {
-    fontSize: 11,
-    fontFamily: Typography.sans.regular,
-    color: '#8C8276',
-  },
-  priceValue: {
-    fontSize: 19,
-    fontFamily: Typography.sans.bold,
-    color: '#B87826',
-  },
-  addToCartBtn: {
-    flex: 1,
-    backgroundColor: '#D48C2B',
-    borderRadius: 16,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
   },
-  addedBtn: {
-    backgroundColor: '#2E7D47',
-  },
-  addToCartText: {
+  buyButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: Typography.sans.bold,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: Typography.sans.bold,
+    color: '#1A1816',
+    letterSpacing: -0.2,
+  },
+  description: {
+    fontSize: 13,
+    fontFamily: Typography.sans.regular,
+    lineHeight: 22,
+    color: '#555555',
+    marginBottom: 24,
+  },
+  ratingsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  ratingsLeft: {
+    alignItems: 'center',
+    paddingRight: 24,
+  },
+  scoreLarge: {
+    fontSize: 44,
+    fontFamily: Typography.sans.bold,
+    color: '#1A1816',
+    lineHeight: 50,
+  },
+  starsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  starIcon: {
+    marginRight: 2,
+  },
+  reviewsCountText: {
+    fontSize: 11,
+    fontFamily: Typography.sans.medium,
+    color: '#8C8276',
+    marginTop: 6,
+  },
+  ratingsRight: {
+    flex: 1,
+    gap: 6,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  starIndexText: {
+    fontSize: 12,
+    fontFamily: Typography.sans.bold,
+    color: '#1A1816',
+    width: 10,
+  },
+  progressBarTrack: {
+    flex: 1,
+    height: 4,
+    backgroundColor: '#EBE7DE',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#EA8616',
+    borderRadius: 2,
   },
 });
