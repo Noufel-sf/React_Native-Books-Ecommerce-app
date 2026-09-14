@@ -52,10 +52,11 @@ export default function ReadingScreen() {
         <FlatList
           data={favoriteBooks}
           numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.gridItem}>
-              <BookCard book={item} width={165} />
+              <BookCard book={item} width="100%" />
             </View>
           )}
           contentContainerStyle={styles.listContent}
@@ -119,11 +120,14 @@ const styles = StyleSheet.create({
     fontFamily: Typography.sans.bold,
   },
   listContent: {
+    paddingHorizontal: 12,
     paddingBottom: 100,
+    gap: 14,
+  },
+  columnWrapper: {
+    gap: 10,
   },
   gridItem: {
     flex: 1,
-    padding: 6,
-    alignItems: 'center',
   },
 });

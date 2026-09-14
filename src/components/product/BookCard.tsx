@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, StyleProp, ViewStyle, DimensionValue } from 'react-native';
 import { Heart, Star } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -9,10 +9,11 @@ import { Shadows, Typography } from '@/constants/theme';
 
 interface BookCardProps {
   book: Book;
-  width?: number;
+  width?: DimensionValue;
+  style?: StyleProp<ViewStyle>;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ book, width = 156 }) => {
+export const BookCard: React.FC<BookCardProps> = ({ book, width, style }) => {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
@@ -29,7 +30,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width = 156 }) => {
   };
 
   return (
-    <View style={[styles.card, { width }]}>
+    <View style={[styles.card, width !== undefined ? { width } : null, style]}>
       {/* Clickable Card Body */}
       <Pressable
         onPress={handleCardPress}
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 0,
     padding: 10,
-    marginRight: 16,
     borderWidth: 2.5,
     borderColor: '#000000',
     position: 'relative',
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   coverImage: {
     width: '100%',
-    height: 180,
+    height: 200,
   },
   ratingTag: {
     position: 'absolute',

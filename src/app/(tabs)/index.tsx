@@ -122,7 +122,7 @@ export default function HomeScreen() {
             horizontal
             data={filteredFeaturedBooks}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <BookCard book={item} />}
+            renderItem={({ item }) => <BookCard book={item} width={172} />}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalListContent}
           />
@@ -175,8 +175,9 @@ const styles = StyleSheet.create({
   },
   horizontalListContent: {
     paddingLeft: 20,
-    paddingRight: 6,
+    paddingRight: 10,
     paddingVertical: 14,
+    gap: 12,
   },
   emptyContainer: {
     padding: 24,

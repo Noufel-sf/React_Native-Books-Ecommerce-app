@@ -31,10 +31,11 @@ export default function ExploreScreen() {
       <FlatList
         data={filteredBooks}
         numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.gridItem}>
-            <BookCard book={item} width={165} />
+            <BookCard book={item} width="100%" />
           </View>
         )}
         contentContainerStyle={styles.listContent}
@@ -73,10 +74,12 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 12,
     paddingBottom: 110,
+    gap: 14,
+  },
+  columnWrapper: {
+    gap: 10,
   },
   gridItem: {
     flex: 1,
-    padding: 6,
-    alignItems: 'center',
   },
 });
