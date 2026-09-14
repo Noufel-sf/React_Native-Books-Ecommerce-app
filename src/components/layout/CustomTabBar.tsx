@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, Compass, BookOpen, User, ShoppingBag } from 'lucide-react-native';
@@ -9,6 +10,119 @@ import { Shadows, Typography } from '@/constants/theme';
 export type CustomTabBarProps = Parameters<
   NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>
 >[0];
+
+interface TabButtonProps {
+  route: { key: string; name: string };
+  isFocused: boolean;
+  onPress: () => void;
+  getTabIcon: (routeName: string, isFocused: boolean) => React.ReactNode;
+  getTabLabel: (routeName: string) => string;
+}
+
+const AnimatedTabButton: React.FC<TabButtonProps> = ({
+  route,
+  isFocused,
+  onPress,
+  getTabIcon,
+  getTabLabel,
+}) => {
+  const scale = useSharedValue(isFocused ? 1 : 0.9);
+
+  useEffect(() => {
+    scale.value = withSpring(isFocused ? 1 : 0.9, {
+      damping: 12,
+      stiffness: 220,
+    });
+  }, [isFocused]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.tabItem,
+        {
+          transform: [
+            { translateX: pressed ? 1.5 : 0 },
+            { translateY: pressed ? 1.5 : 0 },
+          ],
+        },
+      ]}
+      accessibilityRole="button"
+      accessibilityState={isFocused ? { selected: true } : {}}
+      accessibilityLabel={getTabLabel(route.name)}
+    >
+      <Animated.View
+        style={[
+          styles.iconBox,
+          isFocused ? styles.iconBoxFocused : styles.iconBoxDefault,
+          animatedStyle,
+        ]}
+      >
+        {getTabIcon(route.name, isFocused)}
+      </Animated.View>
+      <Text
+        style={[
+          styles.tabLabel,
+          isFocused ? styles.tabLabelFocused : styles.tabLabelDefault,
+        ]}
+      >
+        {getTabLabel(route.name)}
+      </Text>
+    </Pressable>
+  );
+};
+
+const AnimatedCartButton: React.FC<{
+  onPress: () => void;
+  isFocused: boolean;
+  totalCartItems: number;
+}> = ({ onPress, isFocused, totalCartItems }) => {
+  const scale = useSharedValue(isFocused ? 1.06 : 1);
+
+  useEffect(() => {
+    scale.value = withSpring(isFocused ? 1.06 : 1, {
+      damping: 12,
+      stiffness: 200,
+    });
+  }, [isFocused]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <View style={styles.centerButtonWrapper}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.centerButton,
+          isFocused && styles.centerButtonActive,
+          {
+            transform: [
+              { translateX: pressed ? 2 : 0 },
+              { translateY: pressed ? 2 : 0 },
+            ],
+          },
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel="Cart"
+      >
+        <Animated.View style={[{ alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
+          <ShoppingBag size={24} color="#000000" strokeWidth={isFocused ? 3 : 2.5} />
+        </Animated.View>
+        {totalCartItems > 0 && (
+          <View style={styles.cartBadge}>
+            <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
+          </View>
+        )}
+      </Pressable>
+    </View>
+  );
+};
 
 export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   state,
@@ -21,8 +135,8 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8);
 
   const getTabIcon = (routeName: string, isFocused: boolean) => {
-    const color = isFocused ? '#000000' : '#888888';
-    const size = 22;
+    const color = isFocused ? '#000000' : '#777777';
+    const size = 20;
 
     switch (routeName) {
       case 'index':
@@ -76,55 +190,26 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
             }
           };
 
-          // Elevated Center Button in Neobrutalist Yellow
           if (isCenterTab) {
             return (
-              <View key={route.key} style={styles.centerButtonWrapper}>
-                <Pressable
-                  onPress={onPress}
-                  style={({ pressed }) => [
-                    styles.centerButton,
-                    {
-                      transform: [
-                        { translateX: pressed ? 2 : 0 },
-                        { translateY: pressed ? 2 : 0 },
-                      ],
-                    },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Cart"
-                >
-                  <ShoppingBag size={24} color="#000000" strokeWidth={2.5} />
-                  {totalCartItems > 0 && (
-                    <View style={styles.cartBadge}>
-                      <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
-                    </View>
-                  )}
-                </Pressable>
-              </View>
+              <AnimatedCartButton
+                key={route.key}
+                onPress={onPress}
+                isFocused={isFocused}
+                totalCartItems={totalCartItems}
+              />
             );
           }
 
           return (
-            <Pressable
+            <AnimatedTabButton
               key={route.key}
+              route={route}
+              isFocused={isFocused}
               onPress={onPress}
-              style={styles.tabItem}
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-            >
-              <View style={styles.iconContainer}>
-                {getTabIcon(route.name, isFocused)}
-              </View>
-              <Text
-                style={[
-                  styles.tabLabel,
-                  isFocused ? styles.tabLabelFocused : styles.tabLabelDefault,
-                ]}
-              >
-                {getTabLabel(route.name)}
-              </Text>
-            </Pressable>
+              getTabIcon={getTabIcon}
+              getTabLabel={getTabLabel}
+            />
           );
         })}
       </View>
@@ -147,28 +232,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    height: 56,
-    paddingHorizontal: 8,
+    height: 62,
+    paddingHorizontal: 6,
+    paddingTop: 4,
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
-  iconContainer: {
-    position: 'relative',
-    height: 26,
+  iconBox: {
+    width: 44,
+    height: 34,
+    borderRadius: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  iconBoxFocused: {
+    backgroundColor: '#FFDE59',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    ...Shadows.sm,
+  },
+  iconBoxDefault: {
+    backgroundColor: 'transparent',
+    borderWidth: 2.5,
+    borderColor: 'transparent',
+  },
   tabLabel: {
     fontSize: 10,
-    marginTop: 3,
+    marginTop: 2,
     fontFamily: Typography.sans.bold,
   },
   tabLabelDefault: {
-    color: '#888888',
+    color: '#777777',
   },
   tabLabelFocused: {
     color: '#000000',
@@ -189,6 +287,9 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#000000',
     ...Shadows.button,
+  },
+  centerButtonActive: {
+    borderWidth: 3.5,
   },
   cartBadge: {
     position: 'absolute',
