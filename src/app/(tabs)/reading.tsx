@@ -5,6 +5,7 @@ import { BookCard } from '@/components/product/BookCard';
 import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
 import { BOOKS, CONTINUE_READING_BOOKS } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
+import { Typography } from '@/constants/theme';
 
 export default function ReadingScreen() {
   const [activeTab, setActiveTab] = useState<'reading' | 'favorites'>('reading');
@@ -76,8 +77,8 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontSize: 28,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     letterSpacing: -0.5,
   },

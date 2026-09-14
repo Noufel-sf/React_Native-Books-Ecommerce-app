@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { CheckCircle2, ChevronRight, MapPin, CreditCard, Clock, Settings, HelpCircle, LogOut } from 'lucide-react-native';
 import { CURRENT_USER } from '@/data/books';
+import { Typography } from '@/constants/theme';
 
 export default function ProfileScreen() {
   const menuItems = [
@@ -80,8 +81,8 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontSize: 28,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     letterSpacing: -0.5,
   },
@@ -112,8 +113,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   name: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 18,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
   },
   checkIcon: {

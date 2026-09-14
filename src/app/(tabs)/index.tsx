@@ -111,8 +111,8 @@ export default function HomeScreen() {
 
         {/* Featured / Trending Section */}
         <SectionHeader
-          title={selectedCategory === 'all' ? 'Featured Books' : `${selectedCategory.toUpperCase()} Books`}
-          actionText="View all"
+          title={selectedCategory === 'all' ? 'Most Popular' : `${selectedCategory.toUpperCase()} Books`}
+          actionText="Show all"
           onActionPress={() => {}}
         />
 

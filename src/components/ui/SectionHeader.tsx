@@ -23,7 +23,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           style={({ pressed }) => [styles.actionButton, { opacity: pressed ? 0.6 : 1 }]}
         >
           <Text style={styles.actionText}>{actionText}</Text>
-          <ChevronRight size={14} color="#8C8276" style={styles.chevron} />
+          <ChevronRight size={14} color="#EA8616" style={styles.chevron} />
         </Pressable>
       )}
     </View>
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginBottom: 12,
+    marginBottom: 14,
     marginTop: 20,
   },
   title: {
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 13,
     fontFamily: Typography.sans.bold,
-    color: '#8C8276',
+    color: '#EA8616',
   },
   chevron: {
     marginLeft: 2,

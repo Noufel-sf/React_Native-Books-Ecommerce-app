@@ -5,6 +5,7 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { BookCard } from '@/components/product/BookCard';
 import { BOOKS } from '@/data/books';
 import { CATEGORIES } from '@/data/categories';
+import { Typography } from '@/constants/theme';
 
 export default function ExploreScreen() {
   const [query, setQuery] = useState('');
@@ -54,13 +55,14 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontSize: 28,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
+    fontFamily: Typography.sans.regular,
     color: '#8C8276',
     marginTop: 4,
     marginBottom: 16,

@@ -5,6 +5,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react-nativ
 import { Image } from 'expo-image';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'expo-router';
+import { Typography } from '@/constants/theme';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -113,8 +114,8 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontSize: 28,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     letterSpacing: -0.5,
   },

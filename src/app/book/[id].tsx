@@ -49,6 +49,14 @@ export default function BookDetailsScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
+
   const handleBuy = () => {
     addItem(book, 'E-Book');
     setIsAdded(true);
@@ -71,7 +79,7 @@ export default function BookDetailsScreen() {
       {/* Top Navigation Bar */}
       <View style={styles.navBar}>
         <Pressable
-          onPress={() => router.back()}
+          onPress={handleBack}
           style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.6 : 1 }]}
           accessibilityRole="button"
           accessibilityLabel="Go back"
@@ -322,25 +330,26 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   bookCover: {
-    width: 120,
-    height: 172,
-    borderRadius: 14,
+    width: 146,
+    height: 218,
+    borderRadius: 16,
     backgroundColor: '#EBE5D8',
     shadowColor: '#1A1816',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 8,
   },
   heroInfo: {
     flex: 1,
     marginLeft: 18,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
-    fontFamily: Typography.sans.bold,
+    fontSize: 21,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
-    lineHeight: 26,
+    lineHeight: 28,
     letterSpacing: -0.3,
   },
   author: {
@@ -354,7 +363,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.sans.regular,
     color: '#8C8276',
     marginTop: 4,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   genresGrid: {
     flexDirection: 'row',
@@ -443,8 +452,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontFamily: Typography.sans.bold,
+    fontSize: 19,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     letterSpacing: -0.2,
   },

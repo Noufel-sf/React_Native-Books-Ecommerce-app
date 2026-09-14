@@ -25,65 +25,73 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
   };
 
   return (
-    <Pressable
-      onPress={handlePress}
-      style={({ pressed }) => [
-        styles.card,
-        { opacity: pressed ? 0.94 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] },
-      ]}
-    >
-      {/* Left: Thumbnail Cover with Heart Overlay */}
-      <View style={styles.coverContainer}>
-        <BookCover3D imageUrl={book.coverImage} width={75} height={105} />
-        <Pressable
-          onPress={() => toggleFavorite(book.id)}
-          hitSlop={6}
-          style={styles.heartOverlay}
-        >
-          <Heart
-            size={14}
-            color={favorite ? '#C94A3D' : '#FFFFFF'}
-            fill={favorite ? '#C94A3D' : 'rgba(0,0,0,0.35)'}
-          />
-        </Pressable>
-      </View>
-
-      {/* Right Details */}
-      <View style={styles.detailsContainer}>
-        {/* Top: READ NOW & Rating */}
-        <View style={styles.topRow}>
-          <Badge label="READ NOW" variant="readNow" />
-          <Badge label={book.rating.toFixed(1)} variant="rating" />
+    <View style={styles.card}>
+      <Pressable
+        onPress={handlePress}
+        style={({ pressed }) => [
+          styles.contentPressable,
+          { opacity: pressed ? 0.94 : 1 },
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={`Continue reading ${book.title}`}
+      >
+        {/* Left: Thumbnail Cover */}
+        <View style={styles.coverContainer}>
+          <BookCover3D imageUrl={book.coverImage} width={75} height={105} />
         </View>
 
-        {/* Title */}
-        <View style={styles.titleRow}>
-          <Text style={styles.title} numberOfLines={1}>
-            {book.title}
-          </Text>
-          <Bookmark size={13} color="#D48C2B" fill="#D48C2B" style={styles.crownIcon} />
-        </View>
-
-        {/* Author / Subtitle */}
-        <Text style={styles.author} numberOfLines={1}>
-          Novel by {book.author}
-        </Text>
-
-        {/* Progress Bar & Page meta */}
-        {book.readingProgress !== undefined && (
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[styles.progressBarFill, { width: `${book.readingProgress}%` }]}
-              />
-            </View>
-            <Text style={styles.progressText}>
-              {book.readingProgress}% • Page {book.currentPage ?? 120} of {book.pages}
-            </Text>
+        {/* Right Details */}
+        <View style={styles.detailsContainer}>
+          {/* Top: READ NOW & Rating */}
+          <View style={styles.topRow}>
+            <Badge label="READ NOW" variant="readNow" />
+            <Badge label={book.rating.toFixed(1)} variant="rating" />
           </View>
-        )}
-      </View>
-    </Pressable>
+
+          {/* Title */}
+          <View style={styles.titleRow}>
+            <Text style={styles.title} numberOfLines={1}>
+              {book.title}
+            </Text>
+            <Bookmark size={13} color="#D48C2B" fill="#D48C2B" style={styles.crownIcon} />
+          </View>
+
+          {/* Author / Subtitle */}
+          <Text style={styles.author} numberOfLines={1}>
+            Novel by {book.author}
+          </Text>
+
+          {/* Progress Bar & Page meta */}
+          {book.readingProgress !== undefined && (
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[styles.progressBarFill, { width: `${book.readingProgress}%` }]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {book.readingProgress}% • Page {book.currentPage ?? 120} of {book.pages}
+              </Text>
+            </View>
+          )}
+        </View>
+      </Pressable>
+
+      {/* Sibling Heart Overlay button */}
+      <Pressable
+        onPress={() => toggleFavorite(book.id)}
+        hitSlop={8}
+        style={styles.heartOverlay}
+        accessibilityRole="button"
+        accessibilityLabel="Toggle favorite"
+      >
+        <Heart
+          size={14}
+          color={favorite ? '#C94A3D' : '#FFFFFF'}
+          fill={favorite ? '#C94A3D' : 'rgba(0,0,0,0.35)'}
+        />
+      </Pressable>
+    </View>
   );
 };
 
@@ -94,10 +102,14 @@ const styles = StyleSheet.create({
     padding: 14,
     marginHorizontal: 20,
     marginBottom: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ECE5D8',
+    position: 'relative',
+  },
+  contentPressable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   coverContainer: {
     position: 'relative',
