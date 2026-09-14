@@ -6,6 +6,7 @@ import { Book } from '@/types/book';
 import { Badge } from '@/components/ui/Badge';
 import { BookCover3D } from '@/components/product/BookCover3D';
 import { useFavoritesStore } from '@/store/favoritesStore';
+import { Typography } from '@/constants/theme';
 
 interface ContinueReadingCardProps {
   book: Book;
@@ -126,8 +127,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 15,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     flex: 1,
     letterSpacing: -0.2,
@@ -137,6 +138,7 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 12,
+    fontFamily: Typography.sans.medium,
     color: '#8C8276',
     marginTop: 2,
   },
@@ -156,8 +158,8 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 10,
+    fontFamily: Typography.sans.bold,
     color: '#9E9488',
     marginTop: 4,
-    fontWeight: '600',
   },
 });

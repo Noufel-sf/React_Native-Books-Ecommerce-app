@@ -57,6 +57,20 @@ export const BorderRadius = {
   full: 9999,
 } as const;
 
+export const Typography = {
+  serif: {
+    semiBold: 'PlayfairDisplay_600SemiBold',
+    bold: 'PlayfairDisplay_700Bold',
+    extraBold: 'PlayfairDisplay_800ExtraBold',
+  },
+  sans: {
+    regular: 'PlusJakartaSans_400Regular',
+    medium: 'PlusJakartaSans_500Medium',
+    semiBold: 'PlusJakartaSans_600SemiBold',
+    bold: 'PlusJakartaSans_700Bold',
+  },
+} as const;
+
 // Realistic 3D Book & Card Shadow Tokens
 export const Shadows = {
   sm: {

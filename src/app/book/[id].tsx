@@ -13,17 +13,23 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ChevronLeft,
   Share2,
-  Bookmark,
   Heart,
   Star,
   ShoppingBag,
   Check,
+  Volume2,
+  Play,
+  Pause,
+  ChevronRight,
+  BookOpen,
+  Bookmark,
 } from 'lucide-react-native';
 import { BOOKS } from '@/data/books';
 import { BookCover3D } from '@/components/product/BookCover3D';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
 import { BookFormat } from '@/types/book';
+import { Typography } from '@/constants/theme';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -38,6 +44,8 @@ export default function BookDetailsScreen() {
     book.availableFormats[0] ?? 'Hardcover'
   );
   const [isAdded, setIsAdded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [page, setPage] = useState(2);
 
   const handleShare = async () => {
     try {
@@ -95,14 +103,28 @@ export default function BookDetailsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Big 3D Book Cover Centerpiece (matching the reference detail screen) */}
-        <View style={styles.coverSection}>
-          <BookCover3D
-            imageUrl={book.coverImage}
-            width={160}
-            height={230}
-            variant="hero"
-          />
+        {/* Main Cover Section with Volume Slider (Matching Reference Image) */}
+        <View style={styles.heroRow}>
+          {/* Vertical Volume Slider on Left (from reference design) */}
+          <View style={styles.volumeColumn}>
+            <View style={styles.volumeTrack}>
+              <View style={styles.volumeThumb} />
+            </View>
+            <Volume2 size={16} color="#A86C1D" style={{ marginTop: 8 }} />
+          </View>
+
+          {/* 3D Book Cover Centerpiece */}
+          <View style={styles.coverCenter}>
+            <BookCover3D
+              imageUrl={book.coverImage}
+              width={160}
+              height={230}
+              variant="hero"
+            />
+          </View>
+
+          {/* Balance spacer on right */}
+          <View style={{ width: 28 }} />
         </View>
 
         {/* Title & Author */}
@@ -112,11 +134,11 @@ export default function BookDetailsScreen() {
           {book.subtitle && <Text style={styles.subtitle}>{book.subtitle}</Text>}
         </View>
 
-        {/* Stats Grid (Rating, Pages, Language, Audio) */}
+        {/* Stats Row (Rating, Number of Page, Language, Audio) */}
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <View style={styles.statValueRow}>
-              <Star size={14} color="#D48C2B" fill="#D48C2B" />
+              <Star size={13} color="#D48C2B" fill="#D48C2B" />
               <Text style={styles.statValue}>{book.rating.toFixed(1)}</Text>
             </View>
             <Text style={styles.statLabel}>Rating</Text>
@@ -126,7 +148,7 @@ export default function BookDetailsScreen() {
 
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{book.pages}</Text>
-            <Text style={styles.statLabel}>Pages</Text>
+            <Text style={styles.statLabel}>Number Of Page</Text>
           </View>
 
           <View style={styles.statDivider} />
@@ -139,14 +161,14 @@ export default function BookDetailsScreen() {
           <View style={styles.statDivider} />
 
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{book.audioLength ?? 'N/A'}</Text>
+            <Text style={styles.statValue}>{book.audioLength ?? '2h30m'}</Text>
             <Text style={styles.statLabel}>Audio</Text>
           </View>
         </View>
 
         {/* Available Formats Selector */}
         <View style={styles.formatSection}>
-          <Text style={styles.sectionTitle}>Choose Format</Text>
+          <Text style={styles.sectionTitle}>Select Format</Text>
           <View style={styles.formatPillsRow}>
             {book.availableFormats.map((format) => {
               const isSelected = selectedFormat === format;
@@ -173,15 +195,59 @@ export default function BookDetailsScreen() {
           </View>
         </View>
 
-        {/* Publisher & Edition Card (from reference design) */}
+        {/* Editorial Borzoi Card (from reference design) */}
         <View style={styles.editorialCard}>
-          <Text style={styles.borzoiHeading}>EDITORIAL EDITION</Text>
+          <Text style={styles.borzoiHeading}>THIS IS A BORZOI BOOK</Text>
           <Text style={styles.publisherName}>PUBLISHED BY {book.publisher.toUpperCase()}</Text>
           <View style={styles.cardDivider} />
+          <Text style={styles.copyrightText}>© {book.originalYear ?? 1992} by {book.author}</Text>
           <Text style={styles.descriptionText}>{book.description}</Text>
           <View style={styles.isbnRow}>
-            <Text style={styles.isbnText}>ISBN: {book.isbn}</Text>
-            <Text style={styles.yearText}>Est. {book.originalYear ?? 2020}</Text>
+            <Text style={styles.isbnText}>eISBN: {book.isbn}</Text>
+          </View>
+        </View>
+
+        {/* Audio Player & Reader Controller (from reference design) */}
+        <View style={styles.audioPlayerCard}>
+          <View style={styles.audioProgressRow}>
+            <Pressable
+              onPress={() => setIsPlaying(!isPlaying)}
+              style={styles.playPauseBtn}
+            >
+              {isPlaying ? (
+                <Pause size={16} color="#1A1816" />
+              ) : (
+                <Play size={16} color="#1A1816" fill="#1A1816" />
+              )}
+            </Pressable>
+            <View style={styles.audioProgressBar}>
+              <View style={[styles.audioProgressFill, { width: '38%' }]} />
+              <View style={styles.audioKnob} />
+            </View>
+            <Text style={styles.audioTime}>-2h12m</Text>
+          </View>
+
+          {/* Reader Pagination & Chapter Controls */}
+          <View style={styles.pageControlsRow}>
+            <BookOpen size={18} color="#8C8276" />
+            <View style={styles.pagePill}>
+              <Pressable
+                onPress={() => setPage(Math.max(1, page - 1))}
+                hitSlop={8}
+              >
+                <ChevronLeft size={16} color="#FFFFFF" />
+              </Pressable>
+              <Text style={styles.pageText}>
+                {page} / {book.pages}
+              </Text>
+              <Pressable
+                onPress={() => setPage(Math.min(book.pages, page + 1))}
+                hitSlop={8}
+              >
+                <ChevronRight size={16} color="#FFFFFF" />
+              </Pressable>
+            </View>
+            <Bookmark size={18} color="#8C8276" />
           </View>
         </View>
 
@@ -250,31 +316,57 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
   },
-  coverSection: {
+  heroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 6,
+    marginBottom: 20,
+  },
+  volumeColumn: {
+    alignItems: 'center',
+    width: 28,
+  },
+  volumeTrack: {
+    width: 4,
+    height: 80,
+    backgroundColor: '#EBE2D3',
+    borderRadius: 2,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  volumeThumb: {
+    position: 'absolute',
+    top: 32,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#D48C2B',
+  },
+  coverCenter: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
-    marginBottom: 20,
   },
   headerSection: {
     alignItems: 'center',
     marginBottom: 20,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 24,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     textAlign: 'center',
     letterSpacing: -0.3,
   },
   author: {
     fontSize: 14,
+    fontFamily: Typography.sans.medium,
     color: '#7C7368',
     marginTop: 4,
-    fontWeight: '500',
   },
   subtitle: {
     fontSize: 12,
+    fontFamily: Typography.sans.regular,
     color: '#9E9488',
     marginTop: 4,
     fontStyle: 'italic',
@@ -284,7 +376,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: '#ECE5D8',
     marginBottom: 20,
@@ -300,14 +392,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statValue: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 14,
+    fontFamily: Typography.sans.bold,
     color: '#1A1816',
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 10,
+    fontFamily: Typography.sans.regular,
     color: '#8C8276',
     marginTop: 3,
+    textAlign: 'center',
   },
   statDivider: {
     width: 1,
@@ -318,8 +412,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 14,
+    fontFamily: Typography.sans.bold,
     color: '#1A1816',
     marginBottom: 10,
   },
@@ -342,32 +436,32 @@ const styles = StyleSheet.create({
   },
   formatPillText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Typography.sans.medium,
     color: '#6B6258',
   },
   formatPillTextSelected: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
   },
   editorialCard: {
     backgroundColor: '#FAF7F0',
     borderRadius: 20,
-    padding: 20,
+    padding: 22,
     borderWidth: 1,
     borderColor: '#E8DEC9',
     alignItems: 'center',
     marginBottom: 20,
   },
   borzoiHeading: {
-    fontSize: 11,
-    fontWeight: '800',
+    fontSize: 12,
+    fontFamily: Typography.serif.bold,
     letterSpacing: 1.5,
-    color: '#8C7A65',
+    color: '#705F4D',
     marginBottom: 4,
   },
   publisherName: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontFamily: Typography.sans.bold,
     color: '#2A231C',
     letterSpacing: 0.8,
   },
@@ -375,31 +469,103 @@ const styles = StyleSheet.create({
     width: 60,
     height: 1,
     backgroundColor: '#D9CEBD',
-    marginVertical: 14,
+    marginVertical: 12,
+  },
+  copyrightText: {
+    fontSize: 11,
+    fontFamily: Typography.sans.regular,
+    color: '#8C8276',
+    marginBottom: 8,
   },
   descriptionText: {
     fontSize: 13,
+    fontFamily: Typography.serif.semiBold,
     lineHeight: 20,
     color: '#463F38',
     textAlign: 'center',
   },
   isbnRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 16,
-    paddingTop: 12,
+    marginTop: 14,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: '#EBE2D3',
+    width: '100%',
+    alignItems: 'center',
   },
   isbnText: {
     fontSize: 11,
+    fontFamily: Typography.sans.medium,
     color: '#8C8276',
-    fontFamily: 'monospace',
   },
-  yearText: {
+  audioPlayerCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ECE5D8',
+    marginBottom: 20,
+  },
+  audioProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  playPauseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F8F5EE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  audioProgressBar: {
+    flex: 1,
+    height: 4,
+    backgroundColor: '#EBE2D3',
+    borderRadius: 2,
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  audioProgressFill: {
+    height: '100%',
+    backgroundColor: '#D48C2B',
+    borderRadius: 2,
+  },
+  audioKnob: {
+    position: 'absolute',
+    left: '37%',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#D48C2B',
+  },
+  audioTime: {
     fontSize: 11,
+    fontFamily: Typography.sans.medium,
     color: '#8C8276',
+  },
+  pageControlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F3EFE6',
+  },
+  pagePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1A1816',
+    borderRadius: 9999,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    gap: 12,
+  },
+  pageText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: Typography.sans.bold,
   },
   bottomBar: {
     position: 'absolute',
@@ -421,11 +587,12 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 11,
+    fontFamily: Typography.sans.regular,
     color: '#8C8276',
   },
   priceValue: {
     fontSize: 19,
-    fontWeight: '800',
+    fontFamily: Typography.sans.bold,
     color: '#B87826',
   },
   addToCartBtn: {
@@ -444,6 +611,6 @@ const styles = StyleSheet.create({
   addToCartText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
   },
 });

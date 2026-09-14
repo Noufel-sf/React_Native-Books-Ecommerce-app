@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { Heart, Bookmark } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
 import { Badge } from '@/components/ui/Badge';
 import { BookCover3D } from '@/components/product/BookCover3D';
 import { useFavoritesStore } from '@/store/favoritesStore';
-import { Colors } from '@/constants/theme';
+import { Colors, Typography } from '@/constants/theme';
 
 interface BookCardProps {
   book: Book;
@@ -18,6 +18,9 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width = 160 }) => {
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
 
+  // Micro-interaction bounce animation for heart
+  const heartScale = useRef(new Animated.Value(1)).current;
+
   const handleCardPress = () => {
     router.push({
       pathname: '/book/[id]',
@@ -26,6 +29,20 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width = 160 }) => {
   };
 
   const handleFavoritePress = () => {
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.35,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        friction: 4,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     toggleFavorite(book.id);
   };
 
@@ -35,7 +52,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width = 160 }) => {
       style={({ pressed }) => [
         styles.card,
         { width },
-        { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
+        { opacity: pressed ? 0.92 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
       ]}
       accessibilityRole="button"
       accessibilityLabel={`View details for ${book.title}`}
@@ -45,19 +62,18 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width = 160 }) => {
         <Badge label="READ NOW" variant="readNow" />
         <Pressable
           onPress={handleFavoritePress}
-          hitSlop={8}
-          style={({ pressed }) => [
-            styles.heartButton,
-            { opacity: pressed ? 0.6 : 1 },
-          ]}
+          hitSlop={10}
+          style={styles.heartButton}
           accessibilityRole="button"
           accessibilityLabel="Toggle favorite"
         >
-          <Heart
-            size={18}
-            color={favorite ? '#C94A3D' : '#A49B8F'}
-            fill={favorite ? '#C94A3D' : 'transparent'}
-          />
+          <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+            <Heart
+              size={18}
+              color={favorite ? '#C94A3D' : '#A49B8F'}
+              fill={favorite ? '#C94A3D' : 'transparent'}
+            />
+          </Animated.View>
         </Pressable>
       </View>
 
@@ -131,8 +147,8 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     letterSpacing: -0.2,
   },
@@ -141,9 +157,9 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 11,
+    fontFamily: Typography.sans.medium,
     color: '#8C8276',
     marginTop: 2,
-    fontWeight: '500',
   },
   priceRow: {
     flexDirection: 'row',
@@ -153,11 +169,12 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
     color: '#B87826',
   },
   originalPrice: {
     fontSize: 11,
+    fontFamily: Typography.sans.regular,
     color: '#A49B8F',
     textDecorationLine: 'line-through',
   },

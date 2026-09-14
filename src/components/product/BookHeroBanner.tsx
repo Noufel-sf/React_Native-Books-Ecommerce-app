@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
 import { BookCover3D } from '@/components/product/BookCover3D';
-import { Colors } from '@/constants/theme';
+import { Colors, Typography } from '@/constants/theme';
 
 interface BookHeroBannerProps {
   book: Book;
@@ -131,21 +131,21 @@ const styles = StyleSheet.create({
   },
   popularText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
     color: '#A86C1D',
   },
   title: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 18,
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
-    lineHeight: 22,
+    lineHeight: 24,
     letterSpacing: -0.3,
   },
   author: {
     fontSize: 12,
+    fontFamily: Typography.sans.medium,
     color: '#7C7368',
     marginTop: 4,
-    fontWeight: '500',
   },
   readMoreRow: {
     flexDirection: 'row',
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   readMoreText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Typography.sans.bold,
     color: '#9E651D',
   },
   arrowIcon: {

@@ -20,15 +20,20 @@ import {
   BOOKS,
   CONTINUE_READING_BOOKS,
 } from '@/data/books';
-import { Colors } from '@/constants/theme';
+import { Colors, Typography } from '@/constants/theme';
+import { FilterModal, FilterOptions } from '@/components/ui/FilterModal';
 
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({
+    sortBy: 'popular',
+  });
 
-  // Filter books based on search input and selected genre
+  // Filter books based on search input, selected genre, and filter modal options
   const filteredFeaturedBooks = useMemo(() => {
-    return BOOKS.filter((book) => {
+    let result = BOOKS.filter((book) => {
       // Don't repeat the hero book in the main trending section unless filtered specifically
       if (book.id === HERO_BOOK.id && selectedCategory === 'all' && !searchQuery) {
         return false;
@@ -47,9 +52,30 @@ export default function HomeScreen() {
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchesCategory && matchesSearch;
+      // Filter by format
+      const matchesFormat =
+        !filters.format ||
+        filters.format === 'All' ||
+        book.availableFormats.includes(filters.format);
+
+      // Filter by min rating
+      const matchesRating =
+        !filters.minRating || book.rating >= filters.minRating;
+
+      return matchesCategory && matchesSearch && matchesFormat && matchesRating;
     });
-  }, [searchQuery, selectedCategory]);
+
+    // Apply sorting
+    if (filters.sortBy === 'rating') {
+      result.sort((a, b) => b.rating - a.rating);
+    } else if (filters.sortBy === 'priceAsc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (filters.sortBy === 'priceDesc') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [searchQuery, selectedCategory, filters]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -67,7 +93,7 @@ export default function HomeScreen() {
           <SearchBar
             value={searchQuery}
             onChangeText={setSearchQuery}
-            onFilterPress={() => {}}
+            onFilterPress={() => setIsFilterVisible(true)}
             placeholder="Search books, authors, genres..."
           />
         </View>
@@ -123,6 +149,14 @@ export default function HomeScreen() {
         {/* Extra bottom spacing so content scrolls past floating tab bar */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      {/* Filter Bottom Sheet Modal */}
+      <FilterModal
+        visible={isFilterVisible}
+        onClose={() => setIsFilterVisible(false)}
+        currentFilters={filters}
+        onApply={setFilters}
+      />
     </SafeAreaView>
   );
 }
@@ -156,12 +190,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Typography.serif.bold,
     color: '#1A1816',
     marginBottom: 4,
   },
   emptySubtitle: {
     fontSize: 13,
+    fontFamily: Typography.sans.regular,
     color: '#8C8276',
     textAlign: 'center',
   },
