@@ -6,6 +6,7 @@ import { Image } from 'expo-image';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'expo-router';
 import { Typography, Shadows } from '@/constants/theme';
+import { SwipeToDeleteRow } from '@/components/gestures/SwipeToDeleteRow';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export default function CartScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#F8F5EE" />
       <View style={styles.header}>
         <Text style={styles.title}>Your Cart</Text>
-        <Text style={styles.subtitle}>{items.length} unique items</Text>
+        <Text style={styles.subtitle}>
+          {items.length} {items.length === 1 ? 'item' : 'items'} • Swipe left to delete
+        </Text>
       </View>
 
       {items.length === 0 ? (
@@ -43,33 +46,35 @@ export default function CartScreen() {
             data={items}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={styles.cartCard}>
-                <Image source={{ uri: item.book.coverImage }} style={styles.thumbnail} contentFit="cover" />
-                <View style={styles.cardDetails}>
-                  <Text style={styles.itemTitle} numberOfLines={1}>{item.book.title}</Text>
-                  <Text style={styles.itemFormat}>{item.format} • by {item.book.author}</Text>
-                  <Text style={styles.itemPrice}>${(item.price * item.quantity).toFixed(2)}</Text>
+              <SwipeToDeleteRow onDelete={() => removeItem(item.id)}>
+                <View style={styles.cartCard}>
+                  <Image source={{ uri: item.book.coverImage }} style={styles.thumbnail} contentFit="cover" />
+                  <View style={styles.cardDetails}>
+                    <Text style={styles.itemTitle} numberOfLines={1}>{item.book.title}</Text>
+                    <Text style={styles.itemFormat}>{item.format} • by {item.book.author}</Text>
+                    <Text style={styles.itemPrice}>${(item.price * item.quantity).toFixed(2)}</Text>
+                  </View>
+                  <View style={styles.qtyControls}>
+                    <Pressable
+                      onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                      style={styles.qtyBtn}
+                    >
+                      {item.quantity === 1 ? (
+                        <Trash2 size={13} color="#FF6B4A" />
+                      ) : (
+                        <Minus size={13} color="#000000" />
+                      )}
+                    </Pressable>
+                    <Text style={styles.qtyNumber}>{item.quantity}</Text>
+                    <Pressable
+                      onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                      style={styles.qtyBtn}
+                    >
+                      <Plus size={13} color="#000000" />
+                    </Pressable>
+                  </View>
                 </View>
-                <View style={styles.qtyControls}>
-                  <Pressable
-                    onPress={() => updateQuantity(item.id, item.quantity - 1)}
-                    style={styles.qtyBtn}
-                  >
-                    {item.quantity === 1 ? (
-                      <Trash2 size={13} color="#FF6B4A" />
-                    ) : (
-                      <Minus size={13} color="#000000" />
-                    )}
-                  </Pressable>
-                  <Text style={styles.qtyNumber}>{item.quantity}</Text>
-                  <Pressable
-                    onPress={() => updateQuantity(item.id, item.quantity + 1)}
-                    style={styles.qtyBtn}
-                  >
-                    <Plus size={13} color="#000000" />
-                  </Pressable>
-                </View>
-              </View>
+              </SwipeToDeleteRow>
             )}
             contentContainerStyle={styles.listContent}
           />

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,11 @@ import {
   FlatList,
   StyleSheet,
   StatusBar,
+  RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { HomeHeader } from '@/components/layout/HomeHeader';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { BookHeroBanner } from '@/components/product/BookHeroBanner';
@@ -22,48 +25,63 @@ import {
 } from '@/data/books';
 import { Colors, Typography, Shadows } from '@/constants/theme';
 import { FilterModal, FilterOptions } from '@/components/ui/FilterModal';
+import {
+  BookSkeletonCard,
+  HeroSkeletonBanner,
+  ContinueReadingSkeleton,
+} from '@/components/ui/SkeletonLoader';
 
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
+    format: 'All',
     sortBy: 'popular',
   });
 
-  // Filter books based on search input, selected genre, and filter modal options
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    }
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1100);
+  }, []);
+
+  // Filter books based on category, search query, format, and minRating
   const filteredFeaturedBooks = useMemo(() => {
-    let result = BOOKS.filter((book) => {
-      // Don't repeat the hero book in the main trending section unless filtered specifically
-      if (book.id === HERO_BOOK.id && selectedCategory === 'all' && !searchQuery) {
-        return false;
-      }
+    let result = BOOKS.filter((b) => b.id !== HERO_BOOK.id);
 
-      // Filter by genre
-      const matchesCategory =
-        selectedCategory === 'all' ||
-        book.genres.some(
-          (g) => g.toLowerCase() === selectedCategory.toLowerCase()
-        );
+    // Filter by genre category
+    if (selectedCategory !== 'all') {
+      result = result.filter((b) =>
+        b.genres.some((g) => g.toLowerCase() === selectedCategory.toLowerCase())
+      );
+    }
 
-      // Filter by search
-      const matchesSearch =
-        searchQuery.trim() === '' ||
-        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchQuery.toLowerCase());
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          b.author.toLowerCase().includes(q) ||
+          b.genres.some((g) => g.toLowerCase().includes(q))
+      );
+    }
 
-      // Filter by format
-      const matchesFormat =
-        !filters.format ||
-        filters.format === 'All' ||
-        book.availableFormats.includes(filters.format);
+    // Filter by Format (from FilterModal)
+    if (filters.format && filters.format !== 'All') {
+      result = result.filter((b) => b.availableFormats.includes(filters.format as any));
+    }
 
-      // Filter by min rating
-      const matchesRating =
-        !filters.minRating || book.rating >= filters.minRating;
-
-      return matchesCategory && matchesSearch && matchesFormat && matchesRating;
-    });
+    // Filter by Min Rating (from FilterModal)
+    if (filters.minRating) {
+      result = result.filter((b) => b.rating >= filters.minRating!);
+    }
 
     // Apply sorting
     if (filters.sortBy === 'rating') {
@@ -84,6 +102,15 @@ export default function HomeScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor="#000000"
+            colors={['#FFDE59', '#2EEC96', '#FF6B4A']}
+            progressBackgroundColor="#FFFFFF"
+          />
+        }
       >
         {/* User Brand Header */}
         <HomeHeader />
@@ -98,53 +125,69 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Hero Promotional Banner (Think and Grow Rich) */}
-        {!searchQuery && (
-          <BookHeroBanner book={HERO_BOOK} />
-        )}
-
-        {/* Genre / Category Horizontal Selector */}
-        <CategorySelector
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-
-        {/* Featured / Trending Section */}
-        <SectionHeader
-          title={selectedCategory === 'all' ? 'Most Popular' : `${selectedCategory.toUpperCase()} Books`}
-          actionText="Show all"
-          onActionPress={() => {}}
-        />
-
-        {/* Horizontal 3D Book List */}
-        {filteredFeaturedBooks.length > 0 ? (
-          <FlatList
-            horizontal
-            data={filteredFeaturedBooks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <BookCard book={item} width={172} />}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalListContent}
-          />
-        ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>No books found</Text>
-            <Text style={styles.emptySubtitle}>
-              Try searching for another title or selecting a different genre.
-            </Text>
+        {isRefreshing ? (
+          /* Shimmering Skeleton Loader State on Pull-to-Refresh */
+          <View style={{ marginTop: 4 }}>
+            <HeroSkeletonBanner />
+            <SectionHeader title="Refreshing Books..." onActionPress={() => {}} />
+            <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 20, marginVertical: 14 }}>
+              <BookSkeletonCard width={168} />
+              <BookSkeletonCard width={168} />
+            </View>
+            <SectionHeader title="Ongoing Reads..." onActionPress={() => {}} />
+            <ContinueReadingSkeleton />
           </View>
+        ) : (
+          <>
+            {/* Hero Promotional Banner */}
+            {!searchQuery && (
+              <BookHeroBanner book={HERO_BOOK} />
+            )}
+
+            {/* Genre / Category Horizontal Selector */}
+            <CategorySelector
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
+
+            {/* Featured / Trending Section */}
+            <SectionHeader
+              title={selectedCategory === 'all' ? 'Most Popular' : `${selectedCategory.toUpperCase()} Books`}
+              actionText="Show all"
+              onActionPress={() => {}}
+            />
+
+            {/* Horizontal 3D Book List */}
+            {filteredFeaturedBooks.length > 0 ? (
+              <FlatList
+                horizontal
+                data={filteredFeaturedBooks}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => <BookCard book={item} width={172} />}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.horizontalListContent}
+              />
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyTitle}>No books found</Text>
+                <Text style={styles.emptySubtitle}>
+                  Try searching for another title or selecting a different genre.
+                </Text>
+              </View>
+            )}
+
+            {/* Continue Reading Section */}
+            <SectionHeader
+              title="Continue Reading"
+              actionText="View all"
+              onActionPress={() => {}}
+            />
+
+            {CONTINUE_READING_BOOKS.map((book) => (
+              <ContinueReadingCard key={book.id} book={book} />
+            ))}
+          </>
         )}
-
-        {/* Continue Reading Section (from reference design) */}
-        <SectionHeader
-          title="Continue Reading"
-          actionText="View all"
-          onActionPress={() => {}}
-        />
-
-        {CONTINUE_READING_BOOKS.map((book) => (
-          <ContinueReadingCard key={book.id} book={book} />
-        ))}
 
         {/* Extra bottom spacing so content scrolls past floating tab bar */}
         <View style={styles.bottomSpacer} />

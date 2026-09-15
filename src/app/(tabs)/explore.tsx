@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, StatusBar } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, StatusBar, RefreshControl, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { BookCard } from '@/components/product/BookCard';
+import { BookSkeletonCard } from '@/components/ui/SkeletonLoader';
 import { BOOKS } from '@/data/books';
-import { CATEGORIES } from '@/data/categories';
 import { Typography } from '@/constants/theme';
 
 export default function ExploreScreen() {
   const [query, setQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    }
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  }, []);
 
   const filteredBooks = BOOKS.filter(
     (b) =>
@@ -19,7 +31,7 @@ export default function ExploreScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F5EE" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FAF5EE" />
       <View style={styles.header}>
         <Text style={styles.title}>Explore Catalog</Text>
         <Text style={styles.subtitle}>Discover thousands of editorial classics and modern bestsellers</Text>
@@ -28,19 +40,37 @@ export default function ExploreScreen() {
         </View>
       </View>
 
-      <FlatList
-        data={filteredBooks}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.gridItem}>
-            <BookCard book={item} width="100%" />
-          </View>
-        )}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {isRefreshing ? (
+        <View style={{ paddingHorizontal: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+          <View style={{ flex: 1 }}><BookSkeletonCard width="100%" /></View>
+          <View style={{ flex: 1 }}><BookSkeletonCard width="100%" /></View>
+          <View style={{ flex: 1, minWidth: '45%' }}><BookSkeletonCard width="100%" /></View>
+          <View style={{ flex: 1, minWidth: '45%' }}><BookSkeletonCard width="100%" /></View>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredBooks}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.gridItem}>
+              <BookCard book={item} width="100%" />
+            </View>
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor="#000000"
+              colors={['#FFDE59', '#2EEC96', '#FF6B4A']}
+              progressBackgroundColor="#FFFFFF"
+            />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }

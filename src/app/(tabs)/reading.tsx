@@ -8,10 +8,12 @@ import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
 import { BOOKS, CONTINUE_READING_BOOKS } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { Typography, Shadows } from '@/constants/theme';
+import { SwipeToDeleteRow } from '@/components/gestures/SwipeToDeleteRow';
 
 export default function ReadingScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'reading' | 'favorites'>('reading');
+  const [readingList, setReadingList] = useState(CONTINUE_READING_BOOKS);
   const { favorites } = useFavoritesStore();
 
   const favoriteBooks = BOOKS.filter((b) => favorites.includes(b.id));
@@ -21,7 +23,11 @@ export default function ReadingScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#FAF5EE" />
       <View style={styles.header}>
         <Text style={styles.title}>My Library</Text>
-        <Text style={styles.subtitle}>Track your ongoing books and saved wishlist</Text>
+        <Text style={styles.subtitle}>
+          {activeTab === 'reading'
+            ? `${readingList.length} ongoing ${readingList.length === 1 ? 'book' : 'books'} • Swipe left to remove`
+            : `${favoriteBooks.length} saved ${favoriteBooks.length === 1 ? 'book' : 'books'}`}
+        </Text>
 
         <View style={styles.tabToggle}>
           <Pressable
@@ -29,7 +35,7 @@ export default function ReadingScreen() {
             style={[styles.toggleBtn, activeTab === 'reading' && styles.toggleBtnActive]}
           >
             <Text style={[styles.toggleText, activeTab === 'reading' && styles.toggleTextActive]}>
-              Currently Reading ({CONTINUE_READING_BOOKS.length})
+              Currently Reading ({readingList.length})
             </Text>
           </Pressable>
           <Pressable
@@ -46,9 +52,16 @@ export default function ReadingScreen() {
       {activeTab === 'reading' ? (
         <FlatList
           key="reading-list"
-          data={CONTINUE_READING_BOOKS}
+          data={readingList}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <ContinueReadingCard book={item} />}
+          renderItem={({ item }) => (
+            <SwipeToDeleteRow
+              deleteLabel="REMOVE"
+              onDelete={() => setReadingList((prev) => prev.filter((b) => b.id !== item.id))}
+            >
+              <ContinueReadingCard book={item} />
+            </SwipeToDeleteRow>
+          )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />

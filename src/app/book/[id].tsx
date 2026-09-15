@@ -26,6 +26,7 @@ import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
 import { Shadows, Typography } from '@/constants/theme';
 import { BookCard } from '@/components/product/BookCard';
+import { ZoomableBookCover } from '@/components/gestures/ZoomableBookCover';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -75,22 +76,24 @@ export default function BookDetailsScreen() {
   const handleBuy = () => {
     addItem(book, 'E-Book');
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 1800);
   };
 
   const breakdown = book.ratingBreakdown ?? {
-    5: 85,
-    4: 62,
-    3: 18,
-    2: 24,
-    1: 6,
+    5: 82,
+    4: 68,
+    3: 20,
+    2: 12,
+    1: 4,
   };
 
   const genreColors = ['#FFDE59', '#C4A1FF', '#2EEC96', '#68B5FF'];
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFDF5" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FAF5EE" />
 
       {/* Top Navigation Bar */}
       <View style={styles.navBar}>
@@ -158,16 +161,9 @@ export default function BookDetailsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Book Header Summary: Big Framed Cover on Left, Info on Right */}
+        {/* Book Header Summary: Interactive Zoomable Cover on Left, Info on Right */}
         <View style={styles.heroSection}>
-          <View style={styles.coverFrame}>
-            <Image
-              source={{ uri: book.coverImage }}
-              style={styles.bookCover}
-              contentFit="cover"
-              transition={200}
-            />
-          </View>
+          <ZoomableBookCover uri={book.coverImage} width={148} height={220} />
 
           <View style={styles.heroInfo}>
             <Text style={styles.title}>{book.title}</Text>
