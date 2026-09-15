@@ -5,6 +5,7 @@ import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, Compass, BookOpen, User, ShoppingBag } from 'lucide-react-native';
 import { useCartStore } from '@/store/cartStore';
+import { useFavoritesStore } from '@/store/favoritesStore';
 import { Shadows, Typography } from '@/constants/theme';
 
 export type CustomTabBarProps = Parameters<
@@ -17,6 +18,7 @@ interface TabButtonProps {
   onPress: () => void;
   getTabIcon: (routeName: string, isFocused: boolean) => React.ReactNode;
   getTabLabel: (routeName: string) => string;
+  badgeCount?: number;
 }
 
 const AnimatedTabButton: React.FC<TabButtonProps> = ({
@@ -25,6 +27,7 @@ const AnimatedTabButton: React.FC<TabButtonProps> = ({
   onPress,
   getTabIcon,
   getTabLabel,
+  badgeCount,
 }) => {
   const scale = useSharedValue(isFocused ? 1 : 0.9);
 
@@ -63,6 +66,13 @@ const AnimatedTabButton: React.FC<TabButtonProps> = ({
         ]}
       >
         {getTabIcon(route.name, isFocused)}
+        {!!badgeCount && badgeCount > 0 && (
+          <View style={styles.tabBadge}>
+            <Text style={styles.tabBadgeText}>
+              {badgeCount > 99 ? '99+' : badgeCount}
+            </Text>
+          </View>
+        )}
       </Animated.View>
       <Text
         style={[
@@ -131,6 +141,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const totalCartItems = useCartStore((s) => s.getTotalItems());
+  const favoritesCount = useFavoritesStore((s) => s.favorites.length);
 
   const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8);
 
@@ -209,6 +220,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
               onPress={onPress}
               getTabIcon={getTabIcon}
               getTabLabel={getTabLabel}
+              badgeCount={route.name === 'reading' ? favoritesCount : undefined}
             />
           );
         })}
@@ -308,6 +320,25 @@ const styles = StyleSheet.create({
   cartBadgeText: {
     color: '#000000',
     fontSize: 10,
+    fontFamily: Typography.sans.bold,
+  },
+  tabBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FF6B4A',
+    borderRadius: 0,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#000000',
+  },
+  tabBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
     fontFamily: Typography.sans.bold,
   },
 });

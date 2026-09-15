@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, TextInput, Pressable, StyleSheet } from 'react-native';
-import { Search, SlidersHorizontal } from 'lucide-react-native';
+import { View, TextInput, Pressable, StyleSheet, Platform } from 'react-native';
+import { Search, SlidersHorizontal, X } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import { Shadows, Typography } from '@/constants/theme';
 
 interface SearchBarProps {
@@ -18,6 +19,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = 'Search books, authors, genres...',
   autoFocus = false,
 }) => {
+  const handleClear = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+    onChangeText('');
+  };
+
   return (
     <View style={styles.container}>
       <Search size={20} color="#000000" strokeWidth={2.5} style={styles.searchIcon} />
@@ -30,22 +38,35 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         autoFocus={autoFocus}
         returnKeyType="search"
       />
-      <Pressable
-        onPress={onFilterPress}
-        style={({ pressed }) => [
-          styles.filterButton,
-          {
-            transform: [
-              { translateX: pressed ? 1.5 : 0 },
-              { translateY: pressed ? 1.5 : 0 },
-            ],
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel="Open filters"
-      >
-        <SlidersHorizontal size={18} color="#000000" strokeWidth={2.5} />
-      </Pressable>
+      {value.length > 0 && (
+        <Pressable
+          onPress={handleClear}
+          style={styles.clearBtn}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Clear search"
+        >
+          <X size={15} color="#000000" strokeWidth={2.5} />
+        </Pressable>
+      )}
+      {onFilterPress && (
+        <Pressable
+          onPress={onFilterPress}
+          style={({ pressed }) => [
+            styles.filterButton,
+            {
+              transform: [
+                { translateX: pressed ? 1.5 : 0 },
+                { translateY: pressed ? 1.5 : 0 },
+              ],
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Open filters"
+        >
+          <SlidersHorizontal size={18} color="#000000" strokeWidth={2.5} />
+        </Pressable>
+      )}
     </View>
   );
 };
@@ -72,6 +93,12 @@ const styles = StyleSheet.create({
     fontFamily: Typography.sans.medium,
     color: '#000000',
     paddingVertical: 6,
+  },
+  clearBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterButton: {
     width: 38,

@@ -8,6 +8,7 @@ import {
   StatusBar,
   Share,
   FlatList,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -20,11 +21,15 @@ import {
   Check,
   Sparkles,
   Edit3,
+  ShoppingBag,
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
+import * as Haptics from 'expo-haptics';
 import { BOOKS } from '@/data/books';
+import { BookFormat } from '@/types/book';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
+import { useToastStore } from '@/store/toastStore';
 import { Shadows, Typography } from '@/constants/theme';
 import { BookCard } from '@/components/product/BookCard';
 import { ZoomableBookCover } from '@/components/gestures/ZoomableBookCover';
@@ -43,10 +48,32 @@ export default function BookDetailsScreen() {
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
   const addItem = useCartStore((s) => s.addItem);
+  const showToast = useToastStore((s) => s.showToast);
 
+  const [selectedFormat, setSelectedFormat] = useState<BookFormat>(
+    book.availableFormats?.[0] ?? 'E-Book'
+  );
   const [isAdded, setIsAdded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  const getFormatPrice = (format: BookFormat) => {
+    switch (format) {
+      case 'Hardcover':
+        return +(book.price + 5.0).toFixed(2);
+      case 'Paperback':
+        return +(book.price).toFixed(2);
+      case 'E-Book':
+        return +(Math.max(9.99, book.price - 4.0)).toFixed(2);
+      case 'Audiobook':
+        return +(book.price + 2.0).toFixed(2);
+      default:
+        return book.price;
+    }
+  };
+
+  const currentPrice = getFormatPrice(selectedFormat);
 
   const suggestedBooks = useMemo(() => {
     if (!book) return [];
@@ -78,8 +105,17 @@ export default function BookDetailsScreen() {
   };
 
   const handleBuy = () => {
-    addItem(book, 'E-Book');
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    }
+    addItem({ ...book, price: currentPrice }, selectedFormat);
     setIsAdded(true);
+    showToast({
+      title: 'Added to your bag! ✓',
+      message: `${book.title} (${selectedFormat}) • $${currentPrice.toFixed(2)}`,
+      actionLabel: 'VIEW BAG',
+      onAction: () => router.push('/(tabs)/cart' as any),
+    });
     setTimeout(() => {
       setIsAdded(false);
     }, 1800);
@@ -164,6 +200,11 @@ export default function BookDetailsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        onScroll={(e) => {
+          const scrollY = e.nativeEvent.contentOffset.y;
+          setShowStickyBar(scrollY > 280);
+        }}
+        scrollEventThrottle={16}
       >
         {/* Book Header Summary: Interactive Zoomable Cover on Left, Info on Right */}
         <View style={styles.heroSection}>
@@ -228,6 +269,55 @@ export default function BookDetailsScreen() {
           </View>
         </View>
 
+        {/* Dynamic Format Selector */}
+        <View style={styles.formatSection}>
+          <Text style={styles.formatSectionLabel}>SELECT FORMAT</Text>
+          <View style={styles.formatChipsRow}>
+            {(book.availableFormats ?? ['Hardcover', 'Paperback', 'E-Book', 'Audiobook']).map((fmt) => {
+              const isSelected = selectedFormat === fmt;
+              const fmtPrice = getFormatPrice(fmt);
+              return (
+                <Pressable
+                  key={fmt}
+                  onPress={() => {
+                    if (Platform.OS !== 'web') {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+                    }
+                    setSelectedFormat(fmt);
+                  }}
+                  style={({ pressed }) => [
+                    styles.formatChip,
+                    isSelected && styles.formatChipActive,
+                    {
+                      transform: [
+                        { translateX: pressed ? 1.5 : 0 },
+                        { translateY: pressed ? 1.5 : 0 },
+                      ],
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.formatChipTitle,
+                      isSelected && styles.formatChipTitleActive,
+                    ]}
+                  >
+                    {fmt}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.formatChipPrice,
+                      isSelected && styles.formatChipPriceActive,
+                    ]}
+                  >
+                    ${fmtPrice.toFixed(2)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
         {/* Big Neobrutal Buy Action Button */}
         <Pressable
           onPress={handleBuy}
@@ -242,16 +332,16 @@ export default function BookDetailsScreen() {
             },
           ]}
           accessibilityRole="button"
-          accessibilityLabel={`Buy for USD $${book.price.toFixed(2)}`}
+          accessibilityLabel={`Buy ${selectedFormat} for USD $${currentPrice.toFixed(2)}`}
         >
           {isAdded ? (
             <View style={styles.buttonInner}>
               <Check size={22} color="#000000" strokeWidth={3} />
-              <Text style={styles.buyButtonText}>ADDED TO CART ✓</Text>
+              <Text style={styles.buyButtonText}>ADDED TO BAG ✓</Text>
             </View>
           ) : (
             <Text style={styles.buyButtonText}>
-              BUY USD ${book.price.toFixed(2)}
+              BUY {selectedFormat.toUpperCase()} • ${currentPrice.toFixed(2)}
             </Text>
           )}
         </Pressable>
@@ -378,8 +468,54 @@ export default function BookDetailsScreen() {
           </>
         )}
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 60 }} />
       </ScrollView>
+
+      {/* Sticky Bottom Purchase Bar */}
+      {showStickyBar && (
+        <View style={styles.stickyBar}>
+          <View style={styles.stickyMeta}>
+            <Image
+              source={{ uri: book.coverImage }}
+              style={styles.stickyThumbnail}
+              contentFit="cover"
+            />
+            <View style={styles.stickyDetails}>
+              <Text style={styles.stickyTitle} numberOfLines={1}>
+                {book.title}
+              </Text>
+              <Text style={styles.stickyFormat}>
+                {selectedFormat} • <Text style={styles.stickyPrice}>${currentPrice.toFixed(2)}</Text>
+              </Text>
+            </View>
+          </View>
+
+          <Pressable
+            onPress={handleBuy}
+            style={({ pressed }) => [
+              styles.stickyBuyBtn,
+              isAdded && styles.stickyBuyBtnSuccess,
+              {
+                transform: [
+                  { translateX: pressed ? 1.5 : 0 },
+                  { translateY: pressed ? 1.5 : 0 },
+                ],
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Add to bag"
+          >
+            {isAdded ? (
+              <Check size={16} color="#000000" strokeWidth={3} />
+            ) : (
+              <ShoppingBag size={15} color="#000000" strokeWidth={2.5} />
+            )}
+            <Text style={styles.stickyBuyBtnText}>
+              {isAdded ? 'ADDED' : 'ADD TO BAG'}
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       {/* Write Community Review Modal */}
       <WriteReviewModal
@@ -688,5 +824,123 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     gap: 12,
+  },
+  formatSection: {
+    marginBottom: 16,
+    gap: 8,
+  },
+  formatSectionLabel: {
+    fontSize: 11,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: 0.5,
+  },
+  formatChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  formatChip: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 0,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    minWidth: 80,
+    alignItems: 'center',
+    gap: 2,
+    ...Shadows.sm,
+  },
+  formatChipActive: {
+    backgroundColor: '#FFDE59',
+  },
+  formatChipTitle: {
+    fontSize: 11,
+    fontFamily: Typography.sans.bold,
+    color: '#555555',
+  },
+  formatChipTitleActive: {
+    color: '#000000',
+  },
+  formatChipPrice: {
+    fontSize: 12,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+  },
+  formatChipPriceActive: {
+    color: '#000000',
+  },
+  stickyBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 3,
+    borderTopColor: '#000000',
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...Shadows.card,
+    zIndex: 99,
+    elevation: 99,
+  },
+  stickyMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
+  stickyThumbnail: {
+    width: 36,
+    height: 48,
+    borderRadius: 0,
+    borderWidth: 1.5,
+    borderColor: '#000000',
+    backgroundColor: '#ECE5D8',
+  },
+  stickyDetails: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  stickyTitle: {
+    fontSize: 13,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+  },
+  stickyFormat: {
+    fontSize: 11,
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
+    marginTop: 2,
+  },
+  stickyPrice: {
+    fontFamily: Typography.sans.bold,
+    color: '#FF6B4A',
+  },
+  stickyBuyBtn: {
+    backgroundColor: '#FFDE59',
+    borderRadius: 0,
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    ...Shadows.button,
+  },
+  stickyBuyBtnSuccess: {
+    backgroundColor: '#2EEC96',
+  },
+  stickyBuyBtnText: {
+    fontSize: 12,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: 0.5,
   },
 });

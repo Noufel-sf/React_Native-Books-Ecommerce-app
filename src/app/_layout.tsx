@@ -20,6 +20,8 @@ import {
 
 SplashScreen.preventAutoHideAsync();
 
+import { ToastContainer } from '@/components/ui/Toast';
+
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     PlayfairDisplay_600SemiBold,
@@ -61,6 +63,7 @@ export default function RootLayout() {
             }}
           />
         </Stack>
+        <ToastContainer />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
