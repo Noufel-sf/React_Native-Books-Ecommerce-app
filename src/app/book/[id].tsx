@@ -33,7 +33,7 @@ export default function BookDetailsScreen() {
 
   const book =
     BOOKS.find((b) => b.id === id) ??
-    BOOKS.find((b) => b.id === 'concrete-rose') ??
+    BOOKS.find((b) => b.id === 'the-rational-male') ??
     BOOKS[0];
 
   const { isFavorite, toggleFavorite } = useFavoritesStore();
