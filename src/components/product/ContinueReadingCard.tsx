@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Bookmark, Heart, Star } from 'lucide-react-native';
+import { Bookmark, Heart, Star, BookOpen } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
 import { Badge } from '@/components/ui/Badge';
 import { useFavoritesStore } from '@/store/favoritesStore';
+import { useReadingProgressStore } from '@/store/readingProgressStore';
+import { BookReaderModal } from '@/components/product/BookReaderModal';
 import { Shadows, Typography } from '@/constants/theme';
 
 interface ContinueReadingCardProps {
@@ -16,6 +18,15 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorite = isFavorite(book.id);
+  const [readerVisible, setReaderVisible] = useState(false);
+
+  const liveProgress = useReadingProgressStore((s) => s.progressMap[book.id]);
+  const progressPercent = liveProgress !== undefined
+    ? liveProgress.progressPercent
+    : (book.readingProgress ?? 0);
+  const currentPage = liveProgress !== undefined
+    ? liveProgress.currentPage
+    : (book.currentPage ?? 1);
 
   const handlePress = () => {
     router.push({
@@ -72,18 +83,40 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
           </Text>
 
           {/* Progress Bar & Page meta */}
-          {book.readingProgress !== undefined && (
-            <View style={styles.progressContainer}>
-              <View style={styles.progressBarBackground}>
-                <View
-                  style={[styles.progressBarFill, { width: `${book.readingProgress}%` }]}
-                />
-              </View>
-              <Text style={styles.progressText}>
-                {book.readingProgress}% DONE • Page {book.currentPage ?? 120} of {book.pages}
-              </Text>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBarBackground}>
+              <View
+                style={[styles.progressBarFill, { width: `${progressPercent}%` }]}
+              />
             </View>
-          )}
+            <View style={styles.progressMetaRow}>
+              <Text style={styles.progressText}>
+                {progressPercent}% DONE • Page {currentPage} of {book.pages}
+              </Text>
+
+              {/* Neobrutal Resume Button */}
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  setReaderVisible(true);
+                }}
+                style={({ pressed }) => [
+                  styles.resumeBtn,
+                  {
+                    transform: [
+                      { translateX: pressed ? 1 : 0 },
+                      { translateY: pressed ? 1 : 0 },
+                    ],
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Resume reading"
+              >
+                <BookOpen size={11} color="#000000" strokeWidth={2.5} />
+                <Text style={styles.resumeBtnText}>READ</Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       </Pressable>
 
@@ -111,6 +144,17 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
           strokeWidth={2.5}
         />
       </Pressable>
+
+      {/* In-App E-Reader Modal */}
+      <BookReaderModal
+        visible={readerVisible}
+        onClose={() => setReaderVisible(false)}
+        bookId={book.id}
+        title={book.title}
+        author={book.author}
+        coverImage={book.coverImage}
+        onBuyPress={handlePress}
+      />
     </View>
   );
 };
@@ -200,11 +244,33 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#2EEC96',
   },
+  progressMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 6,
+  },
   progressText: {
     fontSize: 10,
     fontFamily: Typography.sans.bold,
     color: '#000000',
-    marginTop: 4,
+  },
+  resumeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFDE59',
+    borderWidth: 1.5,
+    borderColor: '#000000',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    gap: 4,
+    borderRadius: 0,
+    ...Shadows.sm,
+  },
+  resumeBtnText: {
+    fontSize: 9,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
   },
   heartOverlay: {
     position: 'absolute',

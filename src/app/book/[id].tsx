@@ -22,6 +22,7 @@ import {
   Sparkles,
   Edit3,
   ShoppingBag,
+  BookOpen,
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
@@ -35,6 +36,7 @@ import { BookCard } from '@/components/product/BookCard';
 import { ZoomableBookCover } from '@/components/gestures/ZoomableBookCover';
 import { WriteReviewModal } from '@/components/product/WriteReviewModal';
 import { ReviewsFeed } from '@/components/product/ReviewsFeed';
+import { BookReaderModal } from '@/components/product/BookReaderModal';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -56,6 +58,7 @@ export default function BookDetailsScreen() {
   const [isAdded, setIsAdded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [readerModalVisible, setReaderModalVisible] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
   const getFormatPrice = (format: BookFormat) => {
@@ -318,33 +321,58 @@ export default function BookDetailsScreen() {
           </View>
         </View>
 
-        {/* Big Neobrutal Buy Action Button */}
-        <Pressable
-          onPress={handleBuy}
-          style={({ pressed }) => [
-            styles.buyButton,
-            isAdded && styles.buyButtonSuccess,
-            {
-              transform: [
-                { translateX: pressed ? 3 : 0 },
-                { translateY: pressed ? 3 : 0 },
-              ],
-            },
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={`Buy ${selectedFormat} for USD $${currentPrice.toFixed(2)}`}
-        >
-          {isAdded ? (
-            <View style={styles.buttonInner}>
-              <Check size={22} color="#000000" strokeWidth={3} />
-              <Text style={styles.buyButtonText}>ADDED TO BAG ✓</Text>
-            </View>
-          ) : (
-            <Text style={styles.buyButtonText}>
-              BUY {selectedFormat.toUpperCase()} • ${currentPrice.toFixed(2)}
-            </Text>
-          )}
-        </Pressable>
+        {/* Dual Neobrutal Action Buttons: Read Sample & Buy */}
+        <View style={styles.actionButtonsContainer}>
+          <Pressable
+            onPress={() => {
+              if (Platform.OS !== 'web') {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+              }
+              setReaderModalVisible(true);
+            }}
+            style={({ pressed }) => [
+              styles.readSampleButton,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Read sample preview"
+          >
+            <BookOpen size={18} color="#000000" strokeWidth={2.5} />
+            <Text style={styles.readSampleButtonText}>SAMPLE</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={handleBuy}
+            style={({ pressed }) => [
+              styles.buyButton,
+              isAdded && styles.buyButtonSuccess,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={`Buy ${selectedFormat} for USD $${currentPrice.toFixed(2)}`}
+          >
+            {isAdded ? (
+              <View style={styles.buttonInner}>
+                <Check size={20} color="#000000" strokeWidth={3} />
+                <Text style={styles.buyButtonText}>ADDED TO BAG ✓</Text>
+              </View>
+            ) : (
+              <Text style={styles.buyButtonText}>
+                BUY {selectedFormat.toUpperCase()} • ${currentPrice.toFixed(2)}
+              </Text>
+            )}
+          </Pressable>
+        </View>
 
         {/* About this Ebook Section */}
         <View style={styles.sectionHeader}>
@@ -524,6 +552,17 @@ export default function BookDetailsScreen() {
         bookTitle={book.title}
         onClose={() => setReviewModalVisible(false)}
       />
+
+      {/* In-App E-Reader / Sample Reader Modal */}
+      <BookReaderModal
+        visible={readerModalVisible}
+        bookId={book.id}
+        title={book.title}
+        author={book.author}
+        coverImage={book.coverImage}
+        onClose={() => setReaderModalVisible(false)}
+        onBuyPress={handleBuy}
+      />
     </SafeAreaView>
   );
 }
@@ -673,7 +712,33 @@ const styles = StyleSheet.create({
     marginTop: 3,
     textTransform: 'uppercase',
   },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 24,
+  },
+  readSampleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    height: 54,
+    paddingHorizontal: 16,
+    borderRadius: 0,
+    borderWidth: 3,
+    borderColor: '#000000',
+    gap: 6,
+    ...Shadows.card,
+  },
+  readSampleButtonText: {
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: Typography.sans.bold,
+    letterSpacing: 0.3,
+  },
   buyButton: {
+    flex: 1,
     backgroundColor: '#FFDE59',
     height: 54,
     borderRadius: 0,
@@ -681,7 +746,6 @@ const styles = StyleSheet.create({
     borderColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
     ...Shadows.card,
   },
   buyButtonSuccess: {
