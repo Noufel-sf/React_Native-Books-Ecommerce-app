@@ -6,7 +6,6 @@ import { Image } from 'expo-image';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'expo-router';
 import { Typography, Shadows } from '@/constants/theme';
-import { SwipeToDeleteRow } from '@/components/gestures/SwipeToDeleteRow';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -22,7 +21,7 @@ export default function CartScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Your Cart</Text>
         <Text style={styles.subtitle}>
-          {items.length} {items.length === 1 ? 'item' : 'items'} • Swipe left to delete
+          {items.length} {items.length === 1 ? 'item' : 'items'}
         </Text>
       </View>
 
@@ -46,35 +45,40 @@ export default function CartScreen() {
             data={items}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <SwipeToDeleteRow onDelete={() => removeItem(item.id)}>
-                <View style={styles.cartCard}>
-                  <Image source={{ uri: item.book.coverImage }} style={styles.thumbnail} contentFit="cover" />
-                  <View style={styles.cardDetails}>
-                    <Text style={styles.itemTitle} numberOfLines={1}>{item.book.title}</Text>
-                    <Text style={styles.itemFormat}>{item.format} • by {item.book.author}</Text>
-                    <Text style={styles.itemPrice}>${(item.price * item.quantity).toFixed(2)}</Text>
-                  </View>
+              <View style={styles.cartCard}>
+                <Image source={{ uri: item.book.coverImage }} style={styles.thumbnail} contentFit="cover" />
+                <View style={styles.cardDetails}>
+                  <Text style={styles.itemTitle} numberOfLines={1}>{item.book.title}</Text>
+                  <Text style={styles.itemFormat}>{item.format} • by {item.book.author}</Text>
+                  <Text style={styles.itemPrice}>${(item.price * item.quantity).toFixed(2)}</Text>
+                </View>
+                <View style={styles.cardActions}>
+                  <Pressable
+                    onPress={() => removeItem(item.id)}
+                    style={({ pressed }) => [styles.deleteIconBtn, { opacity: pressed ? 0.6 : 1 }]}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Remove item"
+                  >
+                    <Trash2 size={16} color="#000000" strokeWidth={2.2} />
+                  </Pressable>
                   <View style={styles.qtyControls}>
                     <Pressable
-                      onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                      onPress={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                       style={styles.qtyBtn}
                     >
-                      {item.quantity === 1 ? (
-                        <Trash2 size={13} color="#FF6B4A" />
-                      ) : (
-                        <Minus size={13} color="#000000" />
-                      )}
+                      <Minus size={13} color="#000000" strokeWidth={2.5} />
                     </Pressable>
                     <Text style={styles.qtyNumber}>{item.quantity}</Text>
                     <Pressable
                       onPress={() => updateQuantity(item.id, item.quantity + 1)}
                       style={styles.qtyBtn}
                     >
-                      <Plus size={13} color="#000000" />
+                      <Plus size={13} color="#000000" strokeWidth={2.5} />
                     </Pressable>
                   </View>
                 </View>
-              </SwipeToDeleteRow>
+              </View>
             )}
             contentContainerStyle={styles.listContent}
           />
@@ -96,10 +100,11 @@ export default function CartScreen() {
               <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
             </View>
             <Pressable
+              onPress={() => router.push('/checkout' as any)}
               style={({ pressed }) => [styles.checkoutBtn, { opacity: pressed ? 0.9 : 1 }]}
             >
               <Text style={styles.checkoutText}>Proceed to Checkout</Text>
-              <ArrowRight size={16} color="#000000" />
+              <ArrowRight size={16} color="#000000" strokeWidth={2.5} />
             </Pressable>
           </View>
         </View>
@@ -176,6 +181,14 @@ const styles = StyleSheet.create({
     fontFamily: Typography.sans.bold,
     color: '#FF6B4A',
     marginTop: 6,
+  },
+  cardActions: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    height: 75,
+  },
+  deleteIconBtn: {
+    padding: 2,
   },
   qtyControls: {
     flexDirection: 'row',

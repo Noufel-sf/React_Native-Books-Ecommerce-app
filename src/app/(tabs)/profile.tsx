@@ -5,10 +5,20 @@ import { Image } from 'expo-image';
 import { CheckCircle2, ChevronRight, MapPin, CreditCard, Clock, Settings, HelpCircle, LogOut } from 'lucide-react-native';
 import { CURRENT_USER } from '@/data/books';
 import { Typography, Shadows } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import { useOrdersStore } from '@/store/ordersStore';
 
 export default function ProfileScreen() {
+  const router = useRouter();
+  const { orders } = useOrdersStore();
+
   const menuItems = [
-    { icon: <Clock size={18} color="#000000" />, title: 'Order History', subtitle: 'View past orders and shipments' },
+    {
+      icon: <Clock size={18} color="#000000" />,
+      title: 'Order History',
+      subtitle: orders.length > 0 ? `${orders.length} orders placed` : 'View past orders and shipments',
+      route: '/orders',
+    },
     { icon: <MapPin size={18} color="#000000" />, title: 'Delivery Addresses', subtitle: '2 saved addresses' },
     { icon: <CreditCard size={18} color="#000000" />, title: 'Payment Methods', subtitle: 'Saved mock cards' },
     { icon: <Settings size={18} color="#000000" />, title: 'Preferences', subtitle: 'Theme, notifications & font size' },
@@ -43,6 +53,11 @@ export default function ProfileScreen() {
           {menuItems.map((item, index) => (
             <Pressable
               key={index}
+              onPress={() => {
+                if ('route' in item && item.route) {
+                  router.push(item.route as any);
+                }
+              }}
               style={({ pressed }) => [styles.menuItem, { opacity: pressed ? 0.7 : 1 }]}
             >
               <View style={styles.menuIconWrapper}>{item.icon}</View>
