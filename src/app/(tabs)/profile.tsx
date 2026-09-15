@@ -2,15 +2,21 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { CheckCircle2, ChevronRight, MapPin, CreditCard, Clock, Settings, HelpCircle, LogOut } from 'lucide-react-native';
-import { CURRENT_USER } from '@/data/books';
+import { CheckCircle2, ChevronRight, MapPin, CreditCard, Clock, Settings, HelpCircle, LogOut, LogIn, Sparkles } from 'lucide-react-native';
 import { Typography, Shadows } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { useOrdersStore } from '@/store/ordersStore';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { orders } = useOrdersStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
+
+  const handleSignOut = () => {
+    logout();
+    router.push('/login' as any);
+  };
 
   const menuItems = [
     {
@@ -33,20 +39,48 @@ export default function ProfileScreen() {
           <Text style={styles.title}>My Account</Text>
         </View>
 
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
-          <Image source={{ uri: CURRENT_USER.avatarUrl }} style={styles.avatar} contentFit="cover" />
-          <View style={styles.profileInfo}>
-            <View style={styles.nameRow}>
-              <Text style={styles.name}>{CURRENT_USER.name}</Text>
-              <CheckCircle2 size={16} color="#000000" fill="#2EEC96" style={styles.checkIcon} />
-            </View>
-            <Text style={styles.email}>{CURRENT_USER.email}</Text>
-            <View style={styles.memberBadge}>
-              <Text style={styles.memberBadgeText}>LUMINA VIP MEMBER</Text>
+        {/* Profile Card / Guest Card */}
+        {isAuthenticated && user ? (
+          <View style={styles.profileCard}>
+            <Image source={{ uri: user.avatarUrl }} style={styles.avatar} contentFit="cover" />
+            <View style={styles.profileInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{user.name}</Text>
+                <CheckCircle2 size={16} color="#000000" fill="#2EEC96" style={styles.checkIcon} />
+              </View>
+              <Text style={styles.email}>{user.email}</Text>
+              <View style={styles.memberBadge}>
+                <Text style={styles.memberBadgeText}>LUMINA VIP MEMBER</Text>
+              </View>
             </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.guestCard}>
+            <View style={styles.guestBadge}>
+              <Sparkles size={12} color="#000000" />
+              <Text style={styles.guestBadgeText}>GUEST MODE</Text>
+            </View>
+            <Text style={styles.guestTitle}>Sign in to your account</Text>
+            <Text style={styles.guestSubtitle}>
+              Sync your library, track real shipments, and leave verified book reviews.
+            </Text>
+            <Pressable
+              onPress={() => router.push('/login' as any)}
+              style={({ pressed }) => [
+                styles.guestLoginBtn,
+                {
+                  transform: [
+                    { translateX: pressed ? 2 : 0 },
+                    { translateY: pressed ? 2 : 0 },
+                  ],
+                },
+              ]}
+            >
+              <LogIn size={15} color="#000000" strokeWidth={2.5} />
+              <Text style={styles.guestLoginBtnText}>SIGN IN / REGISTER</Text>
+            </Pressable>
+          </View>
+        )}
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
@@ -70,13 +104,41 @@ export default function ProfileScreen() {
           ))}
         </View>
 
-        {/* Logout simulation */}
-        <Pressable
-          style={({ pressed }) => [styles.logoutBtn, { opacity: pressed ? 0.85 : 1 }]}
-        >
-          <LogOut size={16} color="#000000" style={styles.logoutIcon} />
-          <Text style={styles.logoutText}>Sign Out (Simulated)</Text>
-        </Pressable>
+        {/* Sign Out / Sign In Button */}
+        {isAuthenticated ? (
+          <Pressable
+            onPress={handleSignOut}
+            style={({ pressed }) => [
+              styles.logoutBtn,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
+          >
+            <LogOut size={16} color="#000000" style={styles.logoutIcon} />
+            <Text style={styles.logoutText}>Sign Out</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => router.push('/login' as any)}
+            style={({ pressed }) => [
+              styles.logoutBtn,
+              styles.loginAltBtn,
+              {
+                transform: [
+                  { translateX: pressed ? 2 : 0 },
+                  { translateY: pressed ? 2 : 0 },
+                ],
+              },
+            ]}
+          >
+            <LogIn size={16} color="#000000" style={styles.logoutIcon} />
+            <Text style={styles.logoutText}>Sign In</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -220,5 +282,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Typography.sans.bold,
     color: '#000000',
+  },
+  loginAltBtn: {
+    backgroundColor: '#FFDE59',
+  },
+  guestCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    borderRadius: 0,
+    padding: 18,
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    marginBottom: 20,
+    ...Shadows.card,
+  },
+  guestBadge: {
+    backgroundColor: '#FFDE59',
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 0,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  guestBadgeText: {
+    fontSize: 9,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: 0.5,
+  },
+  guestTitle: {
+    fontSize: 18,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    marginBottom: 4,
+  },
+  guestSubtitle: {
+    fontSize: 13,
+    fontFamily: Typography.sans.medium,
+    color: '#666666',
+    lineHeight: 18,
+    marginBottom: 14,
+  },
+  guestLoginBtn: {
+    backgroundColor: '#FFDE59',
+    borderWidth: 2.5,
+    borderColor: '#000000',
+    borderRadius: 0,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    ...Shadows.button,
+  },
+  guestLoginBtnText: {
+    fontSize: 12,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: 0.5,
   },
 });
