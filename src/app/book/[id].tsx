@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Check,
   Sparkles,
+  Edit3,
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { BOOKS } from '@/data/books';
@@ -27,6 +28,8 @@ import { useCartStore } from '@/store/cartStore';
 import { Shadows, Typography } from '@/constants/theme';
 import { BookCard } from '@/components/product/BookCard';
 import { ZoomableBookCover } from '@/components/gestures/ZoomableBookCover';
+import { WriteReviewModal } from '@/components/product/WriteReviewModal';
+import { ReviewsFeed } from '@/components/product/ReviewsFeed';
 
 export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -43,6 +46,7 @@ export default function BookDetailsScreen() {
 
   const [isAdded, setIsAdded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
 
   const suggestedBooks = useMemo(() => {
     if (!book) return [];
@@ -277,11 +281,21 @@ export default function BookDetailsScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Ratings & Reviews</Text>
           <Pressable
-            onPress={() => {}}
-            hitSlop={8}
-            style={styles.arrowButton}
+            onPress={() => setReviewModalVisible(true)}
+            style={({ pressed }) => [
+              styles.writeReviewBtn,
+              {
+                transform: [
+                  { translateX: pressed ? 1 : 0 },
+                  { translateY: pressed ? 1 : 0 },
+                ],
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Write a review"
           >
-            <ArrowRight size={16} color="#000000" strokeWidth={2.5} />
+            <Edit3 size={13} color="#000000" strokeWidth={2.5} />
+            <Text style={styles.writeReviewBtnText}>WRITE REVIEW</Text>
           </Pressable>
         </View>
 
@@ -330,6 +344,12 @@ export default function BookDetailsScreen() {
           </View>
         </View>
 
+        {/* Community Reviews Feed */}
+        <ReviewsFeed
+          bookId={book.id}
+          onWriteReviewPress={() => setReviewModalVisible(true)}
+        />
+
         {/* Suggested Books / Similar Reads Section */}
         {suggestedBooks.length > 0 && (
           <>
@@ -360,6 +380,14 @@ export default function BookDetailsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Write Community Review Modal */}
+      <WriteReviewModal
+        visible={reviewModalVisible}
+        bookId={book.id}
+        bookTitle={book.title}
+        onClose={() => setReviewModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -556,6 +584,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     ...Shadows.sm,
+  },
+  writeReviewBtn: {
+    backgroundColor: '#FFDE59',
+    borderWidth: 2,
+    borderColor: '#000000',
+    borderRadius: 0,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    ...Shadows.sm,
+  },
+  writeReviewBtnText: {
+    fontSize: 11,
+    fontFamily: Typography.sans.bold,
+    color: '#000000',
+    letterSpacing: 0.5,
   },
   contentBox: {
     backgroundColor: '#FFFFFF',
