@@ -33,7 +33,7 @@ import {
   ReaderTheme,
   ReaderFont,
 } from '@/store/readingProgressStore';
-import { Typography, Shadows } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { useToastStore } from '@/store/toastStore';
 
 interface BookReaderModalProps {
@@ -61,36 +61,36 @@ const THEME_STYLES: Record<
   }
 > = {
   light: {
-    bg: '#FAF5EE',
+    bg: '#FFFFFF',
     paper: '#FFFFFF',
-    text: '#111111',
-    subtext: '#555555',
-    border: '#000000',
-    accent: '#FFDE59',
-    quoteBg: '#FFF8DB',
+    text: '#1A1A1A',
+    subtext: '#6B7280',
+    border: '#E5E7EB',
+    accent: '#D97706',
+    quoteBg: '#FBF7F0',
     cardBg: '#FFFFFF',
     barStyle: 'dark-content',
   },
   sepia: {
-    bg: '#F5EFE0',
-    paper: '#EDE3CD',
-    text: '#3A2814',
-    subtext: '#6A5640',
-    border: '#2A1B0D',
-    accent: '#DEAB49',
-    quoteBg: '#E3D7BA',
-    cardBg: '#EFE7D3',
+    bg: '#F7F3E9',
+    paper: '#EDE5D5',
+    text: '#382A1B',
+    subtext: '#6B5842',
+    border: '#DDD1BC',
+    accent: '#D97706',
+    quoteBg: '#E8DEC8',
+    cardBg: '#EFE8D9',
     barStyle: 'dark-content',
   },
   dark: {
     bg: '#121212',
-    paper: '#1A1A1A',
-    text: '#EDEDED',
-    subtext: '#9E9E9E',
-    border: '#404040',
-    accent: '#2EEC96',
-    quoteBg: '#222222',
-    cardBg: '#1E1E1E',
+    paper: '#1E1E1E',
+    text: '#E5E7EB',
+    subtext: '#9CA3AF',
+    border: '#2E2E2E',
+    accent: '#FBBF24',
+    quoteBg: '#252525',
+    cardBg: '#1A1A1A',
     barStyle: 'light-content',
   },
 };
@@ -708,13 +708,11 @@ export const BookReaderModal: React.FC<BookReaderModalProps> = ({
                 style={({ pressed }) => [
                   styles.buySampleBtn,
                   {
-                    borderColor: activeTheme.border,
-                    backgroundColor: '#FFDE59',
-                    transform: [{ translateY: pressed ? 2 : 0 }],
+                    opacity: pressed ? 0.85 : 1,
                   },
                 ]}
               >
-                <ShoppingBag size={16} color="#000000" strokeWidth={2.5} />
+                <ShoppingBag size={16} color="#FFFFFF" strokeWidth={2} />
                 <Text style={styles.buySampleBtnText}>GET FULL BOOK</Text>
               </Pressable>
             </View>
@@ -757,11 +755,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   progressBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 0,
-    borderWidth: 2,
-    ...Shadows.sm,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
   },
   progressBadgeText: {
     fontSize: 10,
@@ -771,24 +767,21 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 34,
     height: 34,
-    borderRadius: 0,
-    borderWidth: 2,
+    borderRadius: 17,
+    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.sm,
   },
   closeButton: {
     width: 34,
     height: 34,
-    borderRadius: 0,
-    borderWidth: 2,
-    backgroundColor: '#FF6B4A',
+    borderRadius: 17,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.sm,
   },
   progressTrack: {
-    height: 4,
+    height: 3,
     width: '100%',
     overflow: 'hidden',
   },
@@ -796,7 +789,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   settingsPanel: {
-    borderBottomWidth: 2.5,
+    borderBottomWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
@@ -820,14 +813,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   themeChip: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 0,
-    borderWidth: 2,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
   },
   themeChipSelected: {
-    borderWidth: 2.5,
-    ...Shadows.sm,
+    borderWidth: 1.5,
   },
   themeChipText: {
     fontSize: 11,
@@ -837,10 +829,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   fontFamilyBtn: {
-    paddingVertical: 6,
+    paddingVertical: 5,
     paddingHorizontal: 12,
-    borderRadius: 0,
-    borderWidth: 2,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
   },
   fontFamilyText: {
     fontSize: 12,
@@ -848,8 +840,8 @@ const styles = StyleSheet.create({
   sizeStepper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderRadius: 0,
+    borderWidth: 1,
+    borderRadius: BorderRadius.full,
   },
   sizeBtn: {
     paddingHorizontal: 10,
@@ -869,14 +861,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 8,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
   },
   chapterTabChip: {
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 0,
-    borderWidth: 2,
-    ...Shadows.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
   },
   chapterTabChipText: {
     fontSize: 11,
@@ -891,12 +882,10 @@ const styles = StyleSheet.create({
   },
   chapterTag: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 3,
-    borderWidth: 2,
-    borderRadius: 0,
+    borderRadius: BorderRadius.full,
     marginBottom: 10,
-    ...Shadows.sm,
   },
   chapterTagText: {
     fontSize: 10,
@@ -904,20 +893,20 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   chapterTitleText: {
-    fontSize: 26,
-    letterSpacing: -0.5,
-    lineHeight: 32,
-    marginBottom: 8,
+    fontSize: 24,
+    letterSpacing: -0.4,
+    lineHeight: 30,
+    marginBottom: 6,
   },
   chapterSubtitleText: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontFamily: Typography.sans.medium,
-    lineHeight: 20,
+    lineHeight: 19,
     marginBottom: 12,
   },
   authorStamp: {
-    borderTopWidth: 1.5,
-    borderColor: '#CCCCCC',
+    borderTopWidth: 1,
+    borderColor: '#E5E7EB',
     paddingTop: 8,
     marginTop: 4,
   },
@@ -927,9 +916,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   quoteCard: {
-    borderWidth: 2,
-    borderLeftWidth: 5,
-    borderRadius: 0,
+    borderLeftWidth: 4,
+    borderRadius: BorderRadius.lg,
     padding: 16,
     marginBottom: 24,
     gap: 10,
@@ -951,19 +939,17 @@ const styles = StyleSheet.create({
   },
   endCard: {
     marginTop: 40,
-    borderWidth: 2.5,
-    borderRadius: 0,
+    borderWidth: 1,
+    borderRadius: BorderRadius.xl,
     padding: 20,
     alignItems: 'center',
     ...Shadows.card,
   },
   endBadge: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderWidth: 2,
-    borderRadius: 0,
+    borderRadius: BorderRadius.full,
     marginBottom: 12,
-    ...Shadows.sm,
   },
   endBadgeText: {
     fontSize: 10,
@@ -971,13 +957,13 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   endTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: Typography.sans.bold,
     marginBottom: 6,
   },
   endDescription: {
-    fontSize: 12,
-    fontFamily: Typography.sans.medium,
+    fontSize: 12.5,
+    fontFamily: Typography.sans.regular,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 18,
@@ -993,10 +979,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 0,
-    borderWidth: 2,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
     gap: 6,
-    ...Shadows.button,
   },
   nextChapterBtnText: {
     fontSize: 12,
@@ -1008,14 +993,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 0,
-    borderWidth: 2.5,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary,
     gap: 6,
-    ...Shadows.button,
   },
   buySampleBtnText: {
     fontSize: 12,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: '#FFFFFF',
   },
 });

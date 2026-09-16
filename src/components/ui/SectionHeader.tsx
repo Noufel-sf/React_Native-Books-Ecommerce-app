@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { ArrowUpRight } from 'lucide-react-native';
-import { Shadows, Typography } from '@/constants/theme';
+import { ChevronRight } from 'lucide-react-native';
+import { Colors, Typography } from '@/constants/theme';
 
 interface SectionHeaderProps {
   title: string;
@@ -22,16 +22,12 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           onPress={onActionPress}
           style={({ pressed }) => [
             styles.actionButton,
-            {
-              transform: [
-                { translateX: pressed ? 1.5 : 0 },
-                { translateY: pressed ? 1.5 : 0 },
-              ],
-            },
+            { opacity: pressed ? 0.75 : 1 },
           ]}
+          hitSlop={8}
         >
           <Text style={styles.actionText}>{actionText}</Text>
-          <ArrowUpRight size={14} color="#000000" strokeWidth={2.5} style={styles.icon} />
+          <ChevronRight size={14} color={Colors.primary} strokeWidth={2.2} />
         </Pressable>
       )}
     </View>
@@ -44,33 +40,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginBottom: 14,
-    marginTop: 22,
+    marginBottom: 12,
+    marginTop: 18,
   },
   title: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: -0.5,
+    color: Colors.text.primary,
+    letterSpacing: -0.3,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFDE59',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
-    ...Shadows.sm,
+    gap: 2,
   },
   actionText: {
-    fontSize: 12,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    textTransform: 'uppercase',
-  },
-  icon: {
-    marginLeft: 3,
+    fontSize: 13,
+    fontFamily: Typography.sans.semiBold,
+    color: Colors.primary,
   },
 });

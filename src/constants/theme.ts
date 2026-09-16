@@ -1,40 +1,50 @@
 export const Colors = {
-  // Neobrutalist Canvas & Core
-  background: '#FFFDF5',       // Warm energetic canvas
+  // Modern Clean Canvas & Surfaces
+  background: '#FFFFFF',       // Pure clean white
   surface: '#FFFFFF',          // Crisp white card surface
-  surfaceSubtle: '#F4EFE6',
-  border: '#000000',           // Signature thick black outline
+  surfaceSubtle: '#FBF7F0',    // Warm cream hero card surface
+  surfaceGray: '#F3F4F6',      // Light gray search & input background
+  border: '#E5E7EB',           // Hairline subtle light gray border
+  borderSubtle: '#F3F4F6',
 
-  // Deep Solid Black Typography
+  // Modern Clean Typography
   text: {
-    primary: '#000000',        // Pure black for maximum punch
-    secondary: '#222222',
-    muted: '#666666',
+    primary: '#1A1A1A',        // Deep elegant charcoal
+    secondary: '#6B7280',      // Balanced readable gray
+    muted: '#9CA3AF',          // Soft subtle gray
     inverse: '#FFFFFF',
-    accent: '#000000',
+    accent: '#D97706',         // Warm golden amber
   },
 
-  // High-Energy Neobrutalist Color Palette
+  // Primary & Accent Brand Colors
+  primary: '#D97706',          // Warm Golden Mustard / Amber
+  primaryLight: '#FEF3C7',     // Soft Warm Gold tint
+  primaryDark: '#B45309',
+
+  // Warm Editorial & Refined Accent Palette
   neo: {
-    yellow: '#FFDE59',         // Electric Canary (Primary action)
-    yellowDark: '#ECC628',
-    orange: '#FF6B4A',         // Punchy Coral/Orange
-    green: '#2EEC96',          // Slime / Mint Green
-    purple: '#C4A1FF',         // Electric Lavender
-    blue: '#68B5FF',           // Sky Pop Blue
-    pink: '#FFA6D5',           // Bubblegum Pink
-    cream: '#FAF7EE',
+    yellow: '#D97706',         // Warm Golden Amber (replaces harsh canary)
+    yellowDark: '#B45309',
+    yellowLight: '#FEF3C7',
+    orange: '#EA580C',
+    green: '#10B981',          // Emerald soft green
+    purple: '#8B5CF6',         // Soft Violet
+    blue: '#3B82F6',           // Royal Blue
+    pink: '#EC4899',
+    cream: '#FBF7F0',          // Signature warm hero cream
   },
 
-  // Status Colors
+  // Status & Tag Colors
   status: {
-    rating: '#000000',
-    starFill: '#FFDE59',
-    discount: '#FF5733',
-    badge: '#FFDE59',
-    badgeText: '#000000',
-    notification: '#FF4136',
-    success: '#2EEC96',
+    rating: '#D97706',
+    starFill: '#FBBF24',
+    discount: '#EF4444',
+    badge: '#FEF3C7',
+    badgeText: '#D97706',
+    picked: '#EEF2FF',         // Soft Lilac / Sky Blue "Picked" pill
+    pickedText: '#6366F1',
+    notification: '#EF4444',
+    success: '#10B981',
   },
 } as const;
 
@@ -64,56 +74,65 @@ export const Spacing = {
 } as const;
 
 export const BorderRadius = {
-  sm: 0,
-  md: 0,
-  lg: 0,
-  xl: 0,
-  '2xl': 0,
-  full: 0,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  xxl: 24,
+  full: 9999,
 } as const;
 
-// Signature Neobrutalist Hard Black Drop Shadows (No blur, crisp offset)
+// Soft Ambient Drop Shadows (Clean, subtle, refined)
 export const Shadows = {
   sm: {
     shadowColor: '#000000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
   card: {
     shadowColor: '#000000',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 2,
   },
   button: {
     shadowColor: '#000000',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  floating: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 8,
   },
   floatingBar: {
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
     elevation: 8,
   },
   heroCover: {
     shadowColor: '#000000',
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
   },
   bookCover: {
     shadowColor: '#000000',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
 } as const;

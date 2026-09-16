@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { CATEGORIES } from '@/data/categories';
-import { Shadows, Typography } from '@/constants/theme';
+import { Colors, Typography } from '@/constants/theme';
 
 interface CategorySelectorProps {
   selectedCategory: string;
@@ -19,21 +19,13 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       contentContainerStyle={styles.scrollContainer}
     >
       {CATEGORIES.map((category) => {
-        const isSelected = selectedCategory === category.id;
+        const isSelected = selectedCategory.toLowerCase() === category.id.toLowerCase();
         return (
           <Pressable
             key={category.id}
             onPress={() => onSelectCategory(category.id)}
-            style={({ pressed }) => [
-              styles.pill,
-              isSelected ? styles.pillActive : styles.pillInactive,
-              {
-                transform: [
-                  { translateX: pressed ? 2 : 0 },
-                  { translateY: pressed ? 2 : 0 },
-                ],
-              },
-            ]}
+            style={styles.tabItem}
+            hitSlop={8}
           >
             <Text
               style={[
@@ -53,32 +45,23 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
-    gap: 10,
+    gap: 20,
   },
-  pill: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
-  },
-  pillActive: {
-    backgroundColor: '#FFDE59',
-    ...Shadows.sm,
-  },
-  pillInactive: {
-    backgroundColor: '#FFFFFF',
+  tabItem: {
+    paddingVertical: 4,
   },
   categoryText: {
-    fontSize: 13,
-    fontFamily: Typography.sans.bold,
+    fontSize: 14,
+    letterSpacing: -0.2,
   },
   textActive: {
-    color: '#000000',
+    fontFamily: Typography.sans.bold,
+    color: Colors.primary, // Golden amber #D97706
   },
   textInactive: {
-    color: '#444444',
+    fontFamily: Typography.sans.medium,
+    color: '#8E8E93', // Subtle gray
   },
 });

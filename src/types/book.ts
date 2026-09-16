@@ -1,6 +1,6 @@
 export type BookFormat = 'Hardcover' | 'Paperback' | 'E-Book' | 'Audiobook';
 
-export type BookBadge = 'Popular' | 'Bestseller' | 'New' | 'Trending' | 'Read Now';
+export type BookBadge = 'Popular' | 'Bestseller' | 'New' | 'Trending' | 'Read Now' | 'Picked';
 
 export interface Book {
   id: string;
@@ -16,6 +16,8 @@ export interface Book {
   originalPrice?: number;
   discountPercent?: number;
   badge?: BookBadge;
+  picked?: boolean;
+  hasCrown?: boolean;
   genres: string[];
   pages: number;
   audioLength?: string;

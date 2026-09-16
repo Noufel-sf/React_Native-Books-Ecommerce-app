@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
-import { Shadows } from '@/constants/theme';
+import { BorderRadius, Shadows } from '@/constants/theme';
 
 interface ZoomableBookCoverProps {
   uri: string;
@@ -82,11 +82,11 @@ export const ZoomableBookCover: React.FC<ZoomableBookCoverProps> = ({
 
 const styles = StyleSheet.create({
   coverFrame: {
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.lg, // 16px
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     ...Shadows.card,
   },
   imageContainer: {

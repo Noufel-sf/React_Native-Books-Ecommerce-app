@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Star, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { Typography, Shadows } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { CURRENT_USER } from '@/data/books';
 import { useReviewsStore } from '@/store/reviewsStore';
 
@@ -156,10 +156,10 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
                         hitSlop={8}
                       >
                         <Star
-                          size={32}
-                          color="#000000"
-                          fill={isFilled ? '#FFDE59' : '#FFFFFF'}
-                          strokeWidth={2.5}
+                          size={30}
+                          color={isFilled ? '#D97706' : '#D1D5DB'}
+                          fill={isFilled ? '#FBBF24' : 'transparent'}
+                          strokeWidth={1.5}
                         />
                       </Pressable>
                     );
@@ -276,18 +276,19 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: '100%',
     backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
     flexDirection: 'column',
-    ...Shadows.card,
+    overflow: 'hidden',
+    ...Shadows.floating,
   },
   headerBar: {
-    backgroundColor: '#FFDE59',
-    borderBottomWidth: 3,
-    borderBottomColor: '#000000',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -298,19 +299,15 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    color: '#1A1A1A',
   },
   closeBtn: {
     width: 32,
     height: 32,
-    borderRadius: 0,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.full,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.sm,
   },
   formScrollView: {
     flexShrink: 1,
@@ -321,32 +318,29 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   bookBanner: {
-    backgroundColor: '#FAF5EE',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
-    padding: 10,
+    backgroundColor: '#FBF7F0',
+    borderRadius: BorderRadius.md,
+    padding: 12,
   },
   bookBannerLabel: {
-    fontSize: 9,
-    fontFamily: Typography.sans.bold,
-    color: '#666666',
-    letterSpacing: 0.5,
+    fontSize: 10,
+    fontFamily: Typography.sans.medium,
+    color: '#6B7280',
+    letterSpacing: 0.3,
   },
   bookBannerTitle: {
     fontSize: 14,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#1A1A1A',
     marginTop: 2,
   },
   ratingSection: {
     gap: 8,
   },
   inputLabel: {
-    fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 12,
+    fontFamily: Typography.sans.semiBold,
+    color: '#1A1A1A',
   },
   starsRow: {
     flexDirection: 'row',
@@ -357,10 +351,8 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   ratingChip: {
-    backgroundColor: '#FAF5EE',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#FEF3C7',
+    borderRadius: BorderRadius.full,
     paddingHorizontal: 10,
     paddingVertical: 4,
     alignSelf: 'flex-start',
@@ -368,8 +360,8 @@ const styles = StyleSheet.create({
   },
   ratingChipText: {
     fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#D97706',
   },
   inputGroup: {
     gap: 6,
@@ -382,51 +374,47 @@ const styles = StyleSheet.create({
   counterText: {
     fontSize: 11,
     fontFamily: Typography.sans.medium,
-    color: '#888888',
+    color: '#9CA3AF',
   },
   textInput: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: BorderRadius.md,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 13,
-    fontFamily: Typography.sans.medium,
-    color: '#000000',
+    fontFamily: Typography.sans.regular,
+    color: '#1A1A1A',
   },
   textArea: {
     minHeight: 85,
   },
   inputError: {
-    borderColor: '#FF6B4A',
-    borderWidth: 2,
+    borderColor: '#EF4444',
   },
   errorText: {
     fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#FF6B4A',
+    fontFamily: Typography.sans.medium,
+    color: '#EF4444',
   },
   footerBar: {
     padding: 14,
-    borderTopWidth: 2.5,
-    borderTopColor: '#000000',
-    backgroundColor: '#FAF5EE',
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
   },
   submitBtn: {
-    backgroundColor: '#FFDE59',
-    borderRadius: 0,
-    borderWidth: 2.5,
-    borderColor: '#000000',
+    backgroundColor: '#D97706',
+    borderRadius: BorderRadius.md,
     paddingVertical: 13,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.button,
+    ...Shadows.card,
   },
   submitBtnText: {
-    fontSize: 13,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 14,
+    fontFamily: Typography.sans.semiBold,
+    color: '#FFFFFF',
   },
 });

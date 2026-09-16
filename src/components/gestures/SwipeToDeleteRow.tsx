@@ -83,19 +83,19 @@ export const SwipeToDeleteRow: React.FC<SwipeToDeleteRowProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Red Neobrutalist Delete Action Button Behind */}
+      {/* Modern Soft Delete Action Button Behind */}
       <View style={styles.actionContainer}>
         <Pressable
           onPress={handleDelete}
           style={({ pressed }) => [
             styles.deleteButton,
-            { opacity: pressed ? 0.85 : 1 },
+            { opacity: pressed ? 0.8 : 1 },
           ]}
           accessibilityRole="button"
           accessibilityLabel="Delete item"
         >
           <Animated.View style={[styles.actionContent, actionAnimatedStyle]}>
-            <Trash2 size={20} color="#000000" strokeWidth={2.5} />
+            <Trash2 size={20} color="#DC2626" strokeWidth={2} />
             <Text style={styles.deleteText}>{deleteLabel}</Text>
           </Animated.View>
         </Pressable>
@@ -103,7 +103,7 @@ export const SwipeToDeleteRow: React.FC<SwipeToDeleteRowProps> = ({
 
       {/* Swipeable Foreground Item */}
       <GestureDetector gesture={panGesture}>
-        <Animated.View style={rowAnimatedStyle}>
+        <Animated.View style={[styles.rowForeground, rowAnimatedStyle]}>
           {children}
         </Animated.View>
       </GestureDetector>
@@ -114,29 +114,32 @@ export const SwipeToDeleteRow: React.FC<SwipeToDeleteRowProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    marginBottom: 2,
+    marginBottom: 12,
     overflow: 'hidden',
+    borderRadius: 16,
   },
   actionContainer: {
     position: 'absolute',
     top: 0,
-    bottom: 12,
+    bottom: 0,
     right: 0,
     width: ACTION_WIDTH - 6,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
+    zIndex: 0,
   },
   deleteButton: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#FF6B4A',
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#FEE2E2',
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.button,
+  },
+  rowForeground: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    zIndex: 1,
   },
   actionContent: {
     alignItems: 'center',
@@ -144,9 +147,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   deleteText: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 10.5,
+    fontFamily: Typography.sans.semiBold,
+    color: '#DC2626',
+    letterSpacing: 0.3,
   },
 });

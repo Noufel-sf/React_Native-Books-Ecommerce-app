@@ -10,7 +10,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check, X, ShoppingBag, Info, AlertTriangle } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { Typography, Shadows } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { useToastStore } from '@/store/toastStore';
 
 export const ToastContainer: React.FC = () => {
@@ -23,9 +23,13 @@ export const ToastContainer: React.FC = () => {
   useEffect(() => {
     if (currentToast) {
       if (Platform.OS !== 'web') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        Haptics.notificationAsync(
+          currentToast.type === 'error'
+            ? Haptics.NotificationFeedbackType.Error
+            : Haptics.NotificationFeedbackType.Success
+        ).catch(() => {});
       }
-      translateY.value = withSpring(0, { damping: 14, stiffness: 220 });
+      translateY.value = withSpring(0, { damping: 16, stiffness: 180 });
       opacity.value = withTiming(1, { duration: 150 });
     } else {
       translateY.value = withTiming(-120, { duration: 200 });
@@ -43,24 +47,24 @@ export const ToastContainer: React.FC = () => {
   const getIcon = () => {
     switch (currentToast.type) {
       case 'error':
-        return <AlertTriangle size={18} color="#000000" strokeWidth={2.5} />;
+        return <AlertTriangle size={17} color="#EF4444" strokeWidth={2} />;
       case 'info':
-        return <Info size={18} color="#000000" strokeWidth={2.5} />;
+        return <Info size={17} color="#3B82F6" strokeWidth={2} />;
       case 'success':
       default:
-        return <ShoppingBag size={18} color="#000000" strokeWidth={2.5} />;
+        return <ShoppingBag size={17} color="#D97706" strokeWidth={2} />;
     }
   };
 
-  const getBgColor = () => {
+  const getIconBgColor = () => {
     switch (currentToast.type) {
       case 'error':
-        return '#FF6B4A';
+        return '#FEE2E2';
       case 'info':
-        return '#2EEC96';
+        return '#EFF6FF';
       case 'success':
       default:
-        return '#FFDE59';
+        return '#FEF3C7';
     }
   };
 
@@ -69,27 +73,26 @@ export const ToastContainer: React.FC = () => {
       pointerEvents="box-none"
       style={[styles.container, { top: Math.max(insets.top + 8, 16) }]}
     >
-      <Animated.View
-        style={[
-          styles.toastCard,
-          { backgroundColor: getBgColor() },
-          animatedStyle,
-        ]}
-      >
-        <View style={styles.iconBox}>{getIcon()}</View>
+      <Animated.View style={[styles.toastCard, animatedStyle]}>
+        {/* Leading Icon */}
+        <View style={[styles.iconBox, { backgroundColor: getIconBgColor() }]}>
+          {getIcon()}
+        </View>
 
+        {/* Content */}
         <View style={styles.textContainer}>
           <Text style={styles.title} numberOfLines={1}>
             {currentToast.title}
           </Text>
-          {currentToast.message && (
+          {currentToast.message ? (
             <Text style={styles.message} numberOfLines={2}>
               {currentToast.message}
             </Text>
-          )}
+          ) : null}
         </View>
 
-        {currentToast.actionLabel && currentToast.onAction && (
+        {/* Optional Action Button */}
+        {currentToast.actionLabel && currentToast.onAction ? (
           <Pressable
             onPress={() => {
               currentToast.onAction?.();
@@ -97,26 +100,21 @@ export const ToastContainer: React.FC = () => {
             }}
             style={({ pressed }) => [
               styles.actionBtn,
-              {
-                transform: [
-                  { translateX: pressed ? 1.5 : 0 },
-                  { translateY: pressed ? 1.5 : 0 },
-                ],
-              },
+              { opacity: pressed ? 0.8 : 1 },
             ]}
           >
             <Text style={styles.actionBtnText}>{currentToast.actionLabel}</Text>
           </Pressable>
-        )}
+        ) : null}
 
+        {/* Dismiss Button */}
         <Pressable
           onPress={hideToast}
-          style={styles.closeBtn}
           hitSlop={8}
-          accessibilityRole="button"
+          style={styles.closeBtn}
           accessibilityLabel="Dismiss notification"
         >
-          <X size={14} color="#000000" strokeWidth={2.5} />
+          <X size={15} color="#9CA3AF" strokeWidth={2} />
         </Pressable>
       </Animated.View>
     </View>
@@ -135,23 +133,21 @@ const styles = StyleSheet.create({
   toastCard: {
     width: '100%',
     maxWidth: 500,
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: '#000000',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderRadius: BorderRadius.xl, // 20px
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    paddingHorizontal: 14,
+    paddingVertical: 11,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    ...Shadows.card,
+    gap: 12,
+    ...Shadows.floating,
   },
   iconBox: {
     width: 32,
     height: 32,
-    borderRadius: 0,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -160,29 +156,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 13,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#1A1A1A',
   },
   message: {
-    fontSize: 11,
-    fontFamily: Typography.sans.medium,
-    color: '#333333',
+    fontSize: 11.5,
+    fontFamily: Typography.sans.regular,
+    color: '#6B7280',
     marginTop: 1,
   },
   actionBtn: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 10,
+    backgroundColor: '#D97706',
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    ...Shadows.sm,
   },
   actionBtnText: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 11,
+    fontFamily: Typography.sans.semiBold,
+    color: '#FFFFFF',
   },
   closeBtn: {
     padding: 4,

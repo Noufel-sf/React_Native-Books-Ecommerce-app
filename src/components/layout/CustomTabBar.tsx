@@ -1,138 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Home, Compass, BookOpen, User, ShoppingBag } from 'lucide-react-native';
+import { Home, Search, BookMarked, User, ShoppingBag } from 'lucide-react-native';
 import { useCartStore } from '@/store/cartStore';
-import { useFavoritesStore } from '@/store/favoritesStore';
-import { Shadows, Typography } from '@/constants/theme';
+import { Colors, Typography } from '@/constants/theme';
 
 export type CustomTabBarProps = Parameters<
   NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>
 >[0];
-
-interface TabButtonProps {
-  route: { key: string; name: string };
-  isFocused: boolean;
-  onPress: () => void;
-  getTabIcon: (routeName: string, isFocused: boolean) => React.ReactNode;
-  getTabLabel: (routeName: string) => string;
-  badgeCount?: number;
-}
-
-const AnimatedTabButton: React.FC<TabButtonProps> = ({
-  route,
-  isFocused,
-  onPress,
-  getTabIcon,
-  getTabLabel,
-  badgeCount,
-}) => {
-  const scale = useSharedValue(isFocused ? 1 : 0.9);
-
-  useEffect(() => {
-    scale.value = withSpring(isFocused ? 1 : 0.9, {
-      damping: 12,
-      stiffness: 220,
-    });
-  }, [isFocused]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.tabItem,
-        {
-          transform: [
-            { translateX: pressed ? 1.5 : 0 },
-            { translateY: pressed ? 1.5 : 0 },
-          ],
-        },
-      ]}
-      accessibilityRole="button"
-      accessibilityState={isFocused ? { selected: true } : {}}
-      accessibilityLabel={getTabLabel(route.name)}
-    >
-      <Animated.View
-        style={[
-          styles.iconBox,
-          isFocused ? styles.iconBoxFocused : styles.iconBoxDefault,
-          animatedStyle,
-        ]}
-      >
-        {getTabIcon(route.name, isFocused)}
-        {!!badgeCount && badgeCount > 0 && (
-          <View style={styles.tabBadge}>
-            <Text style={styles.tabBadgeText}>
-              {badgeCount > 99 ? '99+' : badgeCount}
-            </Text>
-          </View>
-        )}
-      </Animated.View>
-      <Text
-        style={[
-          styles.tabLabel,
-          isFocused ? styles.tabLabelFocused : styles.tabLabelDefault,
-        ]}
-      >
-        {getTabLabel(route.name)}
-      </Text>
-    </Pressable>
-  );
-};
-
-const AnimatedCartButton: React.FC<{
-  onPress: () => void;
-  isFocused: boolean;
-  totalCartItems: number;
-}> = ({ onPress, isFocused, totalCartItems }) => {
-  const scale = useSharedValue(isFocused ? 1.06 : 1);
-
-  useEffect(() => {
-    scale.value = withSpring(isFocused ? 1.06 : 1, {
-      damping: 12,
-      stiffness: 200,
-    });
-  }, [isFocused]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <View style={styles.centerButtonWrapper}>
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.centerButton,
-          isFocused && styles.centerButtonActive,
-          {
-            transform: [
-              { translateX: pressed ? 2 : 0 },
-              { translateY: pressed ? 2 : 0 },
-            ],
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel="Cart"
-      >
-        <Animated.View style={[{ alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
-          <ShoppingBag size={24} color="#000000" strokeWidth={isFocused ? 3 : 2.5} />
-        </Animated.View>
-        {totalCartItems > 0 && (
-          <View style={styles.cartBadge}>
-            <Text style={styles.cartBadgeText}>{totalCartItems}</Text>
-          </View>
-        )}
-      </Pressable>
-    </View>
-  );
-};
 
 export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   state,
@@ -141,53 +17,56 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const totalCartItems = useCartStore((s) => s.getTotalItems());
-  const favoritesCount = useFavoritesStore((s) => s.favorites.length);
 
-  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8);
+  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 14 : 8);
 
-  const getTabIcon = (routeName: string, isFocused: boolean) => {
-    const color = isFocused ? '#000000' : '#777777';
-    const size = 20;
+  const getTabDetails = (routeName: string, isFocused: boolean) => {
+    const activeColor = Colors.primary; // #D97706
+    const inactiveColor = '#9CA3AF';
+    const color = isFocused ? activeColor : inactiveColor;
+    const size = 22;
+    const strokeWidth = isFocused ? 2.4 : 1.8;
 
     switch (routeName) {
       case 'index':
-        return <Home size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
+        return {
+          label: 'Home',
+          icon: <Home size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+        };
       case 'explore':
-        return <Compass size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
-      case 'cart':
-        return <ShoppingBag size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
+        return {
+          label: 'Search',
+          icon: <Search size={size} color={color} strokeWidth={strokeWidth} />,
+        };
       case 'reading':
-        return <BookOpen size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
-      case 'profile':
-        return <User size={size} color={color} strokeWidth={isFocused ? 2.8 : 2} />;
-      default:
-        return <Home size={size} color={color} strokeWidth={2} />;
-    }
-  };
-
-  const getTabLabel = (routeName: string) => {
-    switch (routeName) {
-      case 'index':
-        return 'Home';
-      case 'explore':
-        return 'Explore';
+        return {
+          label: 'Library',
+          icon: <BookMarked size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+        };
       case 'cart':
-        return 'Cart';
-      case 'reading':
-        return 'Library';
+        return {
+          label: 'Cart',
+          icon: <ShoppingBag size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+        };
       case 'profile':
-        return 'Profile';
+        return {
+          label: 'Account',
+          icon: <User size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+        };
       default:
-        return routeName;
+        return {
+          label: routeName,
+          icon: <Home size={size} color={color} strokeWidth={strokeWidth} />,
+        };
     }
   };
 
   return (
-    <View style={[styles.wrapper, { paddingBottom: bottomPadding }]}>
-      <View style={styles.container}>
+    <View style={[styles.tabBarContainer, { paddingBottom: bottomPadding }]}>
+      <View style={styles.tabsRow}>
         {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
           const isFocused = state.index === index;
-          const isCenterTab = route.name === 'cart';
 
           const onPress = () => {
             const event = navigation.emit({
@@ -201,27 +80,40 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
             }
           };
 
-          if (isCenterTab) {
-            return (
-              <AnimatedCartButton
-                key={route.key}
-                onPress={onPress}
-                isFocused={isFocused}
-                totalCartItems={totalCartItems}
-              />
-            );
-          }
+          const { label, icon } = getTabDetails(route.name, isFocused);
 
           return (
-            <AnimatedTabButton
+            <Pressable
               key={route.key}
-              route={route}
-              isFocused={isFocused}
               onPress={onPress}
-              getTabIcon={getTabIcon}
-              getTabLabel={getTabLabel}
-              badgeCount={route.name === 'reading' ? favoritesCount : undefined}
-            />
+              style={({ pressed }) => [
+                styles.tabItem,
+                { opacity: pressed ? 0.7 : 1 },
+              ]}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={label}
+            >
+              <View style={styles.iconWrapper}>
+                {icon}
+                {route.name === 'cart' && totalCartItems > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {totalCartItems > 99 ? '99+' : totalCartItems}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              <Text
+                style={[
+                  styles.tabLabel,
+                  isFocused ? styles.tabLabelActive : styles.tabLabelInactive,
+                ]}
+              >
+                {label}
+              </Text>
+            </Pressable>
           );
         })}
       </View>
@@ -230,23 +122,21 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+  tabBarContainer: {
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 3,
-    borderTopColor: '#000000',
-    ...Shadows.floatingBar,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  container: {
+  tabsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    height: 62,
-    paddingHorizontal: 6,
-    paddingTop: 4,
+    paddingTop: 8,
   },
   tabItem: {
     flex: 1,
@@ -254,89 +144,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 2,
   },
-  iconBox: {
-    width: 44,
-    height: 34,
-    borderRadius: 0,
+  iconWrapper: {
+    position: 'relative',
+    height: 26,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  iconBoxFocused: {
-    backgroundColor: '#FFDE59',
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    ...Shadows.sm,
-  },
-  iconBoxDefault: {
-    backgroundColor: 'transparent',
-    borderWidth: 2.5,
-    borderColor: 'transparent',
   },
   tabLabel: {
-    fontSize: 10,
-    marginTop: 2,
+    fontSize: 10.5,
+    marginTop: 4,
+    letterSpacing: -0.1,
+  },
+  tabLabelActive: {
     fontFamily: Typography.sans.bold,
+    color: Colors.primary, // Golden amber #D97706
   },
-  tabLabelDefault: {
-    color: '#777777',
+  tabLabelInactive: {
+    fontFamily: Typography.sans.medium,
+    color: '#9CA3AF',
   },
-  tabLabelFocused: {
-    color: '#000000',
-  },
-  centerButtonWrapper: {
-    width: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    top: -14,
-  },
-  centerButton: {
-    width: 54,
-    height: 54,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#000000',
-    ...Shadows.button,
-  },
-  centerButtonActive: {
-    borderWidth: 3.5,
-  },
-  cartBadge: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#2EEC96',
-    borderRadius: 0,
-    minWidth: 20,
-    height: 20,
-    paddingHorizontal: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#000000',
-  },
-  cartBadgeText: {
-    color: '#000000',
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-  },
-  tabBadge: {
+  badge: {
     position: 'absolute',
     top: -4,
-    right: -4,
-    backgroundColor: '#FF6B4A',
-    borderRadius: 0,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 3,
+    right: -8,
+    backgroundColor: '#EF4444',
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#000000',
+    paddingHorizontal: 3,
   },
-  tabBadgeText: {
+  badgeText: {
     color: '#FFFFFF',
     fontSize: 9,
     fontFamily: Typography.sans.bold,

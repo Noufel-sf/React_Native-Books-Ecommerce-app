@@ -15,23 +15,22 @@ import * as Haptics from 'expo-haptics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { BookCard } from '@/components/product/BookCard';
 import { BookSkeletonCard } from '@/components/ui/SkeletonLoader';
+import { FilterModal, FilterOptions } from '@/components/ui/FilterModal';
 import { BOOKS } from '@/data/books';
-import { Typography, Shadows } from '@/constants/theme';
+import { Colors, Typography, BorderRadius } from '@/constants/theme';
 import { SearchX, RotateCcw } from 'lucide-react-native';
 
-const CATEGORIES = [
-  'All',
-  'Self-Help',
-  'Philosophy',
-  'Psychology',
-  'Business',
-  'Biography',
-];
+const FILTER_TABS = ['All Result', 'Free', 'Premium', 'Author', 'Genre'];
 
 export default function ExploreScreen() {
   const [query, setQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [activeTab, setActiveTab] = useState('All Result');
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({
+    format: 'All',
+    sortBy: 'popular',
+  });
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -40,158 +39,154 @@ export default function ExploreScreen() {
     }
     setTimeout(() => {
       setIsRefreshing(false);
-    }, 1000);
+    }, 900);
   }, []);
 
+  const handleTabPress = (tab: string) => {
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync().catch(() => {});
+    }
+    setActiveTab(tab);
+  };
+
   const filteredBooks = useMemo(() => {
-    return BOOKS.filter((b) => {
+    let result = BOOKS.filter((b) => {
       const matchesQuery =
         !query.trim() ||
         b.title.toLowerCase().includes(query.toLowerCase()) ||
         b.author.toLowerCase().includes(query.toLowerCase()) ||
         b.genres.some((g) => g.toLowerCase().includes(query.toLowerCase()));
 
-      const matchesCategory =
-        selectedCategory === 'All' || b.genres.includes(selectedCategory);
+      let matchesTab = true;
+      if (activeTab === 'Free') {
+        matchesTab = b.price < 16;
+      } else if (activeTab === 'Premium') {
+        matchesTab = b.price >= 18;
+      } else if (activeTab === 'Genre') {
+        matchesTab = b.genres.includes('Self-Help') || b.genres.includes('Fiction');
+      }
 
-      return matchesQuery && matchesCategory;
+      return matchesQuery && matchesTab;
     });
-  }, [query, selectedCategory]);
+
+    if (filters.sortBy === 'rating') {
+      result.sort((a, b) => b.rating - a.rating);
+    } else if (filters.sortBy === 'priceAsc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (filters.sortBy === 'priceDesc') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [query, activeTab, filters]);
 
   const handleResetFilters = () => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
     setQuery('');
-    setSelectedCategory('All');
+    setActiveTab('All Result');
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FAF5EE" />
-      <View style={styles.header}>
-        <Text style={styles.title}>Explore Catalog</Text>
-        <Text style={styles.subtitle}>Discover thousands of editorial classics and modern bestsellers</Text>
-        <View style={styles.searchContainer}>
-          <SearchBar
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search genres, titles, ISBN..."
-          />
-        </View>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
-        {/* Category Filter Chips */}
+      {/* Top Search Bar */}
+      <View style={styles.searchSection}>
+        <SearchBar
+          value={query}
+          onChangeText={setQuery}
+          onFilterPress={() => setIsFilterVisible(true)}
+          placeholder="Search Book"
+        />
+      </View>
+
+      {/* Quick Filter Tabs (All Result, Free, Premium, Author, Genre) */}
+      <View style={styles.tabsSection}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryScroll}
-          style={styles.categoryScrollWrapper}
+          contentContainerStyle={styles.tabsScroll}
         >
-          {CATEGORIES.map((category) => {
-            const isSelected = selectedCategory === category;
-            const count =
-              category === 'All'
-                ? BOOKS.length
-                : BOOKS.filter((b) => b.genres.includes(category)).length;
-
+          {FILTER_TABS.map((tab) => {
+            const isSelected = activeTab === tab;
             return (
               <Pressable
-                key={category}
-                onPress={() => {
-                  if (Platform.OS !== 'web') {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-                  }
-                  setSelectedCategory(category);
-                }}
-                style={({ pressed }) => [
-                  styles.categoryPill,
-                  isSelected && styles.categoryPillActive,
-                  {
-                    transform: [
-                      { translateX: pressed ? 1.5 : 0 },
-                      { translateY: pressed ? 1.5 : 0 },
-                    ],
-                  },
-                ]}
+                key={tab}
+                onPress={() => handleTabPress(tab)}
+                style={styles.tabItem}
+                hitSlop={6}
               >
                 <Text
                   style={[
-                    styles.categoryPillText,
-                    isSelected && styles.categoryPillTextActive,
+                    styles.tabText,
+                    isSelected ? styles.tabTextActive : styles.tabTextInactive,
                   ]}
                 >
-                  {category}
+                  {tab}
                 </Text>
-                <View
-                  style={[
-                    styles.categoryCountBadge,
-                    isSelected && styles.categoryCountBadgeActive,
-                  ]}
-                >
-                  <Text style={styles.categoryCountText}>{count}</Text>
-                </View>
               </Pressable>
             );
           })}
         </ScrollView>
       </View>
 
+      {/* 2-Column Books Grid */}
       {isRefreshing ? (
-        <View style={{ paddingHorizontal: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-          <View style={{ flex: 1 }}><BookSkeletonCard width="100%" /></View>
-          <View style={{ flex: 1 }}><BookSkeletonCard width="100%" /></View>
-          <View style={{ flex: 1, minWidth: '45%' }}><BookSkeletonCard width="100%" /></View>
-          <View style={{ flex: 1, minWidth: '45%' }}><BookSkeletonCard width="100%" /></View>
+        <View style={styles.skeletonGrid}>
+          <View style={styles.skeletonCol}>
+            <BookSkeletonCard width="100%" />
+            <BookSkeletonCard width="100%" />
+          </View>
+          <View style={styles.skeletonCol}>
+            <BookSkeletonCard width="100%" />
+            <BookSkeletonCard width="100%" />
+          </View>
         </View>
       ) : filteredBooks.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <View style={styles.emptyIconBox}>
-            <SearchX size={36} color="#000000" strokeWidth={2.5} />
-          </View>
-          <Text style={styles.emptyTitle}>No matching books found</Text>
+          <SearchX size={36} color="#9CA3AF" />
+          <Text style={styles.emptyTitle}>No Books Found</Text>
           <Text style={styles.emptySubtitle}>
-            We couldn't find any titles matching your search and category filter.
+            We couldn't find any titles matching "{query}".
           </Text>
-          <Pressable
-            onPress={handleResetFilters}
-            style={({ pressed }) => [
-              styles.resetBtn,
-              {
-                transform: [
-                  { translateX: pressed ? 2 : 0 },
-                  { translateY: pressed ? 2 : 0 },
-                ],
-              },
-            ]}
-          >
-            <RotateCcw size={15} color="#000000" strokeWidth={2.5} />
-            <Text style={styles.resetBtnText}>RESET FILTERS</Text>
+          <Pressable onPress={handleResetFilters} style={styles.resetBtn}>
+            <RotateCcw size={14} color="#FFFFFF" />
+            <Text style={styles.resetBtnText}>Clear Filters</Text>
           </Pressable>
         </View>
       ) : (
         <FlatList
           data={filteredBooks}
           numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.gridItem}>
-              <BookCard book={item} width="100%" />
-            </View>
-          )}
-          contentContainerStyle={styles.listContent}
+          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={styles.gridContent}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={onRefresh}
-              tintColor="#000000"
-              colors={['#FFDE59', '#2EEC96', '#FF6B4A']}
-              progressBackgroundColor="#FFFFFF"
+              tintColor={Colors.primary}
+              colors={[Colors.primary]}
             />
           }
+          renderItem={({ item }) => (
+            <View style={styles.gridItem}>
+              <BookCard book={item} width="100%" />
+            </View>
+          )}
         />
       )}
+
+      {/* Filter Bottom Sheet Modal */}
+      <FilterModal
+        visible={isFilterVisible}
+        onClose={() => setIsFilterVisible(false)}
+        currentFilters={filters}
+        onApply={setFilters}
+      />
     </SafeAreaView>
   );
 }
@@ -199,136 +194,94 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAF5EE',
+    backgroundColor: '#FFFFFF',
   },
-  header: {
+  searchSection: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 4,
+    paddingTop: 10,
+    paddingBottom: 8,
   },
-  title: {
-    fontSize: 28,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: -0.5,
+  tabsSection: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
-  subtitle: {
-    fontSize: 13,
-    fontFamily: Typography.sans.medium,
-    color: '#555555',
-    marginTop: 4,
-    marginBottom: 12,
-  },
-  searchContainer: {
-    marginBottom: 12,
-  },
-  categoryScrollWrapper: {
-    marginBottom: 8,
-  },
-  categoryScroll: {
-    gap: 8,
-    paddingRight: 20,
-    paddingBottom: 4,
-  },
-  categoryPill: {
-    flexDirection: 'row',
+  tabsScroll: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    gap: 6,
-    ...Shadows.sm,
+    gap: 22,
   },
-  categoryPillActive: {
-    backgroundColor: '#FFDE59',
+  tabItem: {
+    paddingVertical: 4,
   },
-  categoryPillText: {
-    fontSize: 12,
+  tabText: {
+    fontSize: 14,
+    letterSpacing: -0.2,
+  },
+  tabTextActive: {
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: Colors.primary, // Golden Amber #D97706
   },
-  categoryPillTextActive: {
-    color: '#000000',
+  tabTextInactive: {
+    fontFamily: Typography.sans.medium,
+    color: '#8E8E93',
   },
-  categoryCountBadge: {
-    backgroundColor: '#FAF5EE',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-  },
-  categoryCountBadgeActive: {
-    backgroundColor: '#FFFFFF',
-  },
-  categoryCountText: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-  },
-  listContent: {
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 110,
+  gridContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 100,
   },
   columnWrapper: {
-    gap: 10,
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   gridItem: {
+    width: '47.5%',
+  },
+  skeletonGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    gap: 16,
+  },
+  skeletonCol: {
     flex: 1,
+    gap: 16,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingBottom: 80,
-  },
-  emptyIconBox: {
-    width: 68,
-    height: 68,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 14,
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    ...Shadows.card,
+    paddingHorizontal: 30,
+    paddingBottom: 60,
   },
   emptyTitle: {
     fontSize: 18,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: Colors.text.primary,
+    marginTop: 14,
+    marginBottom: 6,
   },
   emptySubtitle: {
     fontSize: 13,
-    fontFamily: Typography.sans.medium,
-    color: '#666666',
+    fontFamily: Typography.sans.regular,
+    color: '#8E8E93',
     textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 18,
+    lineHeight: 19,
+    marginBottom: 20,
   },
   resetBtn: {
-    backgroundColor: '#FFDE59',
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    ...Shadows.button,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.full,
   },
   resetBtnText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
   },
 });

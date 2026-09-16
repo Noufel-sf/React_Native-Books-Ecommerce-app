@@ -51,14 +51,14 @@ export const BookCover3D: React.FC<BookCover3DProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 0,
-    backgroundColor: '#FAF6EE',
+    borderRadius: 12,
+    backgroundColor: 'transparent',
   },
   bookWrapper: {
-    borderRadius: 0,
+    borderRadius: 12,
     overflow: 'hidden',
     position: 'relative',
-    backgroundColor: '#EBE4D5',
+    backgroundColor: '#F3F4F6',
   },
   coverImage: {
     width: '100%',

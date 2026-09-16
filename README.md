@@ -1,21 +1,21 @@
-# ⚡ LUMINA BOOKS — Neo-Brutalist Mobile E-Commerce & E-Reader
+# 📚 LUMINA BOOKS — Modern Minimalist Editorial Bookstore & E-Reader
 
 [![React Native](https://img.shields.io/badge/React_Native-0.76+-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-SDK_52-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Zustand](https://img.shields.io/badge/State-Zustand_5-443E38?style=for-the-badge&logo=react&logoColor=white)](https://github.com/pmndrs/zustand)
 [![Reanimated](https://img.shields.io/badge/Animations-Reanimated_3-FF5722?style=for-the-badge&logo=framer&logoColor=white)](https://docs.swmansion.com/react-native-reanimated/)
-[![Design System](https://img.shields.io/badge/Style-Hard_Neobrutalism-FFDE59?style=for-the-badge&logoColor=black&labelColor=000000)](https://github.com)
+[![Design System](https://img.shields.io/badge/Style-Modern_Minimalist-D97706?style=for-the-badge&logoColor=white&labelColor=1A1A1A)](https://github.com)
 
-A state-of-the-art mobile commerce experience and digital reading platform built for book lovers. Engineered with high-energy **Hard Neobrutalism** aesthetics, tactile micro-haptics, smooth gesture interactions, and a fully customizable **In-App E-Reader**.
+A state-of-the-art mobile commerce experience and digital reading platform built for book lovers. Engineered with a **Modern Minimalist Editorial Bookstore** aesthetic, pure white `#FFFFFF` canvas, warm cream `#FBF7F0` hero surfaces, golden amber `#D97706` accents, tactile micro-haptics, smooth gesture interactions, and a fully customizable **In-App E-Reader**.
 
 ---
 
 ## 📸 Core Highlights
 
-| In-App E-Reader (3 Themes) | Interactive Checkout & Ticket | Sticky Purchase & Formats |
+| In-App E-Reader (3 Themes) | Interactive Checkout & Receipt | Sticky Purchase & Formats |
 | :---: | :---: | :---: |
-| OLED Dark, Sepia, & Classic Light with live scroll progress tracking | Multi-step shipping, live credit card graphic, and perforated barcode receipt | Dynamic format picker (`Hardcover`, `E-Book`, etc.) with sticky bottom bar |
+| OLED Dark, Sepia, & Classic Light with live scroll progress tracking | Multi-step shipping, interactive live credit card graphic, and digital receipt | Dynamic format picker (`Hardcover`, `E-Book`, etc.) with sticky bottom bar |
 
 ---
 
@@ -25,10 +25,10 @@ A state-of-the-art mobile commerce experience and digital reading platform built
 - **3 Adaptive Reading Themes**:
   - `Classic Light`: Crisp typography on warm parchment cream (`#FAF5EE`).
   - `Warm Sepia Paper`: Natural paper grain aesthetic for eye comfort (`#F5EFE0`).
-  - `OLED Dark Mode`: Deep pitch-black canvas (`#121212`) with neon mint accents.
+  - `OLED Dark Mode`: Deep pitch-black canvas (`#121212`) with refined amber accents.
 - **Dynamic Typography Scaling**: Real-time `A-` / `A+` font scaler (13px to 24px) and instant **Editorial Serif** (Playfair Display) vs **Modern Sans** (Plus Jakarta Sans) font switcher.
 - **Live Scroll Progress Tracking**: Calculates read percentage on the fly and automatically syncs with Zustand + AsyncStorage.
-- **Authentic Excerpts & Chapter Jumps**: Rich multi-chapter previews for bestsellers (*The 48 Laws of Power*, *Atomic Habits*, *Can't Hurt Me*, *The Rational Male*, *Clean Code*, etc.) with pull-quotes and chapter bookmarks.
+- **Authentic Excerpts & Chapter Jumps**: Rich multi-chapter previews for bestsellers (*The Psychology Of Money*, *The Design of Everyday Things*, *Sapiens*, *Atomic Habits*, *Fairy Tale*, etc.) with pull-quotes and chapter bookmarks.
 
 ### 🛍️ 2. Comprehensive E-Commerce Experience
 - **Dynamic Format Switcher**: Real-time price and format updates between `Hardcover`, `Paperback`, `E-Book`, and `Audiobook`.
@@ -37,7 +37,7 @@ A state-of-the-art mobile commerce experience and digital reading platform built
   1. Shipping Address validation with real-time field status.
   2. Payment Method selection with **interactive live credit card flip graphic**.
   3. Order Review with subtotal, taxes, shipping, and total calculation.
-- **Perforated Barcode Order Receipt**: Neobrutalist digital receipt ticket modal featuring a simulated barcode, order ID (`LUM-XXXXX`), and rubber-stamped "PAID" badge.
+- **Digital Order Receipt**: Minimalist digital receipt ticket modal featuring order ID (`LUM-XXXXX`), status badge, and item breakdown.
 - **Persistent Order History**: Re-open past receipts anytime from the user profile.
 
 ### ⭐ 3. Community Reviews & Ratings Feed
@@ -56,29 +56,38 @@ A state-of-the-art mobile commerce experience and digital reading platform built
 
 ---
 
-## 🎨 Hard Neobrutalism Design System
+## 🎨 Modern Minimalist Editorial Bookstore Design System
 
-The application strictly enforces a **Zero Border Radius** rule across all screens, creating a distinctive, retro-modern, high-impact design:
+The application features a refined, clean aesthetic with soft rounded geometry, warm hero cards, and ambient drop shadows:
 
 ```typescript
 // Core Design Tokens (src/constants/theme.ts)
 export const Colors = {
-  background: '#FFFDF5',    // Energetic warm canvas
-  surface: '#FFFFFF',       // Crisp card surface
-  border: '#000000',        // 2.5px - 3px solid black borders
-  neo: {
-    yellow: '#FFDE59',      // Primary Action Canary
-    orange: '#FF6B4A',      // Coral Accent / Danger
-    green: '#2EEC96',       // Mint Success / OLED Accent
-    purple: '#C4A1FF',      // Electric Lavender
-    blue: '#68B5FF',        // Sky Pop Blue
-  }
+  background: '#FFFFFF',        // Pure white clean canvas
+  surface: '#FFFFFF',           // Elevated white surfaces
+  surfaceHero: '#FBF7F0',       // Warm cream hero card surface
+  primary: '#D97706',           // Golden Amber accent
+  textPrimary: '#1A1A1A',       // Deep charcoal typography
+  textSecondary: '#6B7280',     // Subtle slate gray text
+  borderSubtle: '#F3F4F6',      // Delicate hairline dividers
+  badgePicked: '#F3E8FF',       // Soft lilac pill badge
+  badgePopular: '#EFF6FF',      // Soft blue pill badge
+};
+
+export const BorderRadius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  full: 9999,
 };
 
 export const Shadows = {
-  card:   { shadowColor: '#000', shadowOffset: { width: 4, height: 4 }, shadowOpacity: 1, shadowRadius: 0, elevation: 5 },
-  button: { shadowColor: '#000', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 1, shadowRadius: 0, elevation: 4 },
-  sm:     { shadowColor: '#000', shadowOffset: { width: 2, height: 2 }, shadowOpacity: 1, shadowRadius: 0, elevation: 2 },
+  sm:     { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
+  card:   { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
+  hero:   { shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.1, shadowRadius: 16, elevation: 6 },
+  floating:{ shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 20, elevation: 8 },
 };
 ```
 

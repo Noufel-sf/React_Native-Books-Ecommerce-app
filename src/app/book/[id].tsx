@@ -31,7 +31,7 @@ import { BookFormat } from '@/types/book';
 import { useFavoritesStore } from '@/store/favoritesStore';
 import { useCartStore } from '@/store/cartStore';
 import { useToastStore } from '@/store/toastStore';
-import { Shadows, Typography } from '@/constants/theme';
+import { Colors, Shadows, Typography, BorderRadius } from '@/constants/theme';
 import { BookCard } from '@/components/product/BookCard';
 import { ZoomableBookCover } from '@/components/gestures/ZoomableBookCover';
 import { WriteReviewModal } from '@/components/product/WriteReviewModal';
@@ -132,11 +132,11 @@ export default function BookDetailsScreen() {
     1: 4,
   };
 
-  const genreColors = ['#FFDE59', '#C4A1FF', '#2EEC96', '#68B5FF'];
+  const genreColors = ['#FEF3C7', '#F3E8FF', '#ECFDF5', '#EFF6FF'];
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FAF5EE" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Top Navigation Bar */}
       <View style={styles.navBar}>
@@ -243,7 +243,7 @@ export default function BookDetailsScreen() {
           <View style={styles.metricCard}>
             <View style={styles.ratingValueRow}>
               <Text style={styles.metricValue}>{book.rating.toFixed(1)}</Text>
-              <Star size={13} color="#000000" fill="#FFDE59" />
+              <Star size={13} color="#D97706" fill="#FBBF24" />
             </View>
             <Text style={styles.metricLabel}>
               {book.reviewsCount > 1000
@@ -426,9 +426,9 @@ export default function BookDetailsScreen() {
               {[1, 2, 3, 4, 5].map((s) => (
                 <Star
                   key={s}
-                  size={15}
-                  color="#000000"
-                  fill="#FFDE59"
+                  size={14}
+                  color="#FBBF24"
+                  fill="#FBBF24"
                   style={styles.starIcon}
                 />
               ))}
@@ -570,7 +570,7 @@ export default function BookDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFDF5',
+    backgroundColor: '#FFFFFF',
   },
   navBar: {
     flexDirection: 'row',
@@ -578,43 +578,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 10,
+    backgroundColor: '#FFFFFF',
   },
   iconBtn: {
     width: 40,
     height: 40,
-    borderRadius: 0,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2.5,
-    borderColor: '#000000',
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.sm,
   },
   navRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   bookmarkBadge: {
     width: 40,
     height: 40,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    borderWidth: 2.5,
-    borderColor: '#000000',
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.sm,
   },
   bookmarkBadgeActive: {
-    backgroundColor: '#FF6B4A',
+    backgroundColor: '#FEF3C7',
   },
   sendIcon: {
     transform: [{ rotate: '-15deg' }],
   },
   scrollContent: {
     paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
   },
   heroSection: {
     flexDirection: 'row',
@@ -625,9 +621,7 @@ const styles = StyleSheet.create({
   coverFrame: {
     width: 148,
     height: 220,
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.lg,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     ...Shadows.card,
@@ -638,28 +632,28 @@ const styles = StyleSheet.create({
   },
   heroInfo: {
     flex: 1,
-    marginLeft: 18,
+    marginLeft: 16,
     justifyContent: 'center',
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    lineHeight: 28,
-    letterSpacing: -0.4,
+    color: Colors.text.primary,
+    lineHeight: 26,
+    letterSpacing: -0.3,
   },
   author: {
-    fontSize: 14,
-    fontFamily: Typography.sans.bold,
-    color: '#FF6B4A',
-    marginTop: 6,
+    fontSize: 13.5,
+    fontFamily: Typography.sans.semiBold,
+    color: Colors.primary,
+    marginTop: 4,
   },
   releaseDate: {
     fontSize: 11,
     fontFamily: Typography.sans.medium,
-    color: '#666666',
-    marginTop: 4,
-    marginBottom: 12,
+    color: '#9CA3AF',
+    marginTop: 3,
+    marginBottom: 10,
   },
   genresGrid: {
     flexDirection: 'row',
@@ -667,17 +661,15 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   genrePill: {
-    paddingHorizontal: 9,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 0,
-    borderWidth: 1.5,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.full,
+    backgroundColor: '#F3F4F6',
   },
   genreText: {
     fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    textTransform: 'uppercase',
+    fontFamily: Typography.sans.semiBold,
+    color: '#4B5563',
   },
   metricsContainer: {
     flexDirection: 'row',
@@ -686,14 +678,13 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
+    backgroundColor: '#F9FAFB',
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
     paddingVertical: 10,
     paddingHorizontal: 4,
     alignItems: 'center',
-    ...Shadows.sm,
   },
   ratingValueRow: {
     flexDirection: 'row',
@@ -701,15 +692,15 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   metricValue: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: Colors.text.primary,
   },
   metricLabel: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#666666',
-    marginTop: 3,
+    fontSize: 9.5,
+    fontFamily: Typography.sans.medium,
+    color: '#9CA3AF',
+    marginTop: 2,
     textTransform: 'uppercase',
   },
   actionButtonsContainer: {
@@ -722,34 +713,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    height: 54,
-    paddingHorizontal: 16,
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: '#000000',
+    backgroundColor: '#F3F4F6',
+    height: 50,
+    paddingHorizontal: 18,
+    borderRadius: BorderRadius.lg,
     gap: 6,
-    ...Shadows.card,
   },
   readSampleButtonText: {
-    color: '#000000',
-    fontSize: 14,
+    color: Colors.text.primary,
+    fontSize: 13.5,
     fontFamily: Typography.sans.bold,
-    letterSpacing: 0.3,
   },
   buyButton: {
     flex: 1,
-    backgroundColor: '#FFDE59',
-    height: 54,
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: '#000000',
+    backgroundColor: Colors.primary,
+    height: 50,
+    borderRadius: BorderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.card,
+    ...Shadows.button,
   },
   buyButtonSuccess: {
-    backgroundColor: '#2EEC96',
+    backgroundColor: '#10B981',
   },
   buttonInner: {
     flexDirection: 'row',
@@ -757,10 +742,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buyButtonText: {
-    color: '#000000',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 14.5,
     fontFamily: Typography.sans.bold,
-    letterSpacing: 0.5,
+    letterSpacing: 0.2,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -769,74 +754,64 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 19,
+    fontSize: 17,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: -0.3,
+    color: Colors.text.primary,
+    letterSpacing: -0.2,
   },
   arrowButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.sm,
   },
   writeReviewBtn: {
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    backgroundColor: '#FEF3C7',
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    ...Shadows.sm,
+    gap: 4,
   },
   writeReviewBtnText: {
     fontSize: 11,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    color: Colors.primary,
   },
   contentBox: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
+    backgroundColor: '#F9FAFB',
+    borderRadius: BorderRadius.lg,
     padding: 14,
     marginBottom: 22,
-    ...Shadows.card,
   },
   description: {
     fontSize: 13,
     fontFamily: Typography.sans.regular,
-    lineHeight: 22,
-    color: '#222222',
+    lineHeight: 20,
+    color: '#4B5563',
   },
   ratingsCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
     padding: 16,
     ...Shadows.card,
   },
   ratingsLeft: {
     alignItems: 'center',
-    paddingRight: 20,
+    paddingRight: 18,
   },
   scoreLarge: {
-    fontSize: 42,
+    fontSize: 38,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    lineHeight: 48,
+    color: Colors.text.primary,
+    lineHeight: 42,
   },
   starsRow: {
     flexDirection: 'row',
@@ -848,13 +823,13 @@ const styles = StyleSheet.create({
   },
   reviewsCountText: {
     fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#666666',
-    marginTop: 6,
+    fontFamily: Typography.sans.medium,
+    color: '#9CA3AF',
+    marginTop: 4,
   },
   ratingsRight: {
     flex: 1,
-    gap: 6,
+    gap: 5,
   },
   progressRow: {
     flexDirection: 'row',
@@ -862,23 +837,22 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   starIndexText: {
-    fontSize: 12,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontSize: 11,
+    fontFamily: Typography.sans.semiBold,
+    color: '#6B7280',
     width: 10,
   },
   progressBarTrack: {
     flex: 1,
-    height: 7,
-    backgroundColor: '#FAF5EE',
-    borderRadius: 0,
-    borderWidth: 1.5,
-    borderColor: '#000000',
+    height: 6,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#FFDE59',
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
   },
   suggestedListWrapper: {
     marginHorizontal: -20,
@@ -896,7 +870,7 @@ const styles = StyleSheet.create({
   formatSectionLabel: {
     fontSize: 11,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: '#8E8E93',
     letterSpacing: 0.5,
   },
   formatChipsRow: {
@@ -906,34 +880,35 @@ const styles = StyleSheet.create({
   },
   formatChip: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     minWidth: 80,
     alignItems: 'center',
     gap: 2,
-    ...Shadows.sm,
   },
   formatChipActive: {
-    backgroundColor: '#FFDE59',
+    backgroundColor: '#FEF3C7',
+    borderColor: Colors.primary,
   },
   formatChipTitle: {
     fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#555555',
+    fontFamily: Typography.sans.medium,
+    color: '#6B7280',
   },
   formatChipTitleActive: {
-    color: '#000000',
+    color: Colors.primary,
+    fontFamily: Typography.sans.bold,
   },
   formatChipPrice: {
     fontSize: 12,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: Colors.text.primary,
   },
   formatChipPriceActive: {
-    color: '#000000',
+    color: Colors.primary,
   },
   stickyBar: {
     position: 'absolute',
@@ -941,17 +916,20 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 3,
-    borderTopColor: '#000000',
-    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    paddingHorizontal: 20,
     paddingTop: 10,
-    paddingBottom: 22,
+    paddingBottom: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...Shadows.card,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 10,
     zIndex: 99,
-    elevation: 99,
   },
   stickyMeta: {
     flexDirection: 'row',
@@ -962,10 +940,9 @@ const styles = StyleSheet.create({
   stickyThumbnail: {
     width: 36,
     height: 48,
-    borderRadius: 0,
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    backgroundColor: '#ECE5D8',
+    borderRadius: BorderRadius.xs,
+    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
   },
   stickyDetails: {
     marginLeft: 10,
@@ -974,24 +951,22 @@ const styles = StyleSheet.create({
   stickyTitle: {
     fontSize: 13,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: Colors.text.primary,
   },
   stickyFormat: {
     fontSize: 11,
     fontFamily: Typography.sans.medium,
-    color: '#666666',
+    color: '#9CA3AF',
     marginTop: 2,
   },
   stickyPrice: {
     fontFamily: Typography.sans.bold,
-    color: '#FF6B4A',
+    color: Colors.primary,
   },
   stickyBuyBtn: {
-    backgroundColor: '#FFDE59',
-    borderRadius: 0,
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    paddingHorizontal: 16,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 18,
     paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -999,12 +974,12 @@ const styles = StyleSheet.create({
     ...Shadows.button,
   },
   stickyBuyBtnSuccess: {
-    backgroundColor: '#2EEC96',
+    backgroundColor: '#10B981',
   },
   stickyBuyBtnText: {
     fontSize: 12,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
 });

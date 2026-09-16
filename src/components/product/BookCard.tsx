@@ -1,11 +1,19 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, StyleProp, ViewStyle, DimensionValue } from 'react-native';
-import { Heart, Star } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  DimensionValue,
+} from 'react-native';
+import { Star, Crown, BookOpen, Heart } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
 import { useFavoritesStore } from '@/store/favoritesStore';
-import { Shadows, Typography } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 
 interface BookCardProps {
   book: Book;
@@ -25,28 +33,18 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width, style }) => {
     });
   };
 
-  const handleFavoritePress = () => {
-    toggleFavorite(book.id);
-  };
-
   return (
     <View style={[styles.card, width !== undefined ? { width } : null, style]}>
-      {/* Clickable Card Body */}
       <Pressable
         onPress={handleCardPress}
         style={({ pressed }) => [
           styles.clickableBody,
-          {
-            transform: [
-              { translateX: pressed ? 2 : 0 },
-              { translateY: pressed ? 2 : 0 },
-            ],
-          },
+          { opacity: pressed ? 0.92 : 1 },
         ]}
         accessibilityRole="button"
         accessibilityLabel={`View ${book.title}`}
       >
-        {/* Book Cover Frame */}
+        {/* Book Cover Frame with Soft Drop Shadow & Crown */}
         <View style={styles.coverFrame}>
           <Image
             source={{ uri: book.coverImage }}
@@ -54,14 +52,34 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width, style }) => {
             contentFit="cover"
             transition={200}
           />
-          {/* Rating tag in bottom left of cover */}
-          <View style={styles.ratingTag}>
-            <Star size={10} color="#000000" fill="#FFDE59" />
-            <Text style={styles.ratingText}>{book.rating.toFixed(1)}</Text>
-          </View>
+
+          {/* Top-Right Crown Emblem */}
+          {(book.hasCrown || book.badge === 'Popular' || book.badge === 'Bestseller') && (
+            <View style={styles.crownBadge}>
+              <Crown size={12} color="#D97706" fill="#FBBF24" />
+            </View>
+          )}
+
+          {/* Floating Subtle Wishlist Toggle */}
+          <Pressable
+            onPress={(e) => {
+              e.stopPropagation?.();
+              toggleFavorite(book.id);
+            }}
+            hitSlop={8}
+            style={styles.heartBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Toggle favorite"
+          >
+            <Heart
+              size={12}
+              color={favorite ? '#EF4444' : '#FFFFFF'}
+              fill={favorite ? '#EF4444' : 'rgba(0,0,0,0.2)'}
+            />
+          </Pressable>
         </View>
 
-        {/* Title & Author */}
+        {/* Title & Author Info */}
         <View style={styles.infoSection}>
           <Text style={styles.title} numberOfLines={1}>
             {book.title}
@@ -70,38 +88,21 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width, style }) => {
             {book.author}
           </Text>
 
-          {/* Price Tag Pill */}
-          <View style={styles.priceRow}>
-            <View style={styles.pricePill}>
-              <Text style={styles.priceText}>${book.price.toFixed(2)}</Text>
+          {/* Rating & Picked Pill Row */}
+          <View style={styles.metaRow}>
+            <View style={styles.ratingBox}>
+              <Star size={11} color="#FBBF24" fill="#FBBF24" />
+              <Text style={styles.ratingText}>{book.rating.toFixed(1)}</Text>
             </View>
+
+            {book.picked && (
+              <View style={styles.pickedBadge}>
+                <BookOpen size={9} color="#6366F1" strokeWidth={2.2} />
+                <Text style={styles.pickedText}>Picked</Text>
+              </View>
+            )}
           </View>
         </View>
-      </Pressable>
-
-      {/* Sibling Wishlist Heart Sticker Button */}
-      <Pressable
-        onPress={handleFavoritePress}
-        hitSlop={8}
-        style={({ pressed }) => [
-          styles.heartBtn,
-          favorite && styles.heartBtnActive,
-          {
-            transform: [
-              { translateX: pressed ? 1.5 : 0 },
-              { translateY: pressed ? 1.5 : 0 },
-            ],
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel="Toggle favorite"
-      >
-        <Heart
-          size={14}
-          color="#000000"
-          fill={favorite ? '#FF6B4A' : '#FFFFFF'}
-          strokeWidth={2.5}
-        />
       </Pressable>
     </View>
   );
@@ -109,96 +110,92 @@ export const BookCard: React.FC<BookCardProps> = ({ book, width, style }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    padding: 10,
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    position: 'relative',
-    ...Shadows.card,
+    width: 140,
+    marginRight: 14,
   },
   clickableBody: {
-    flex: 1,
+    width: '100%',
   },
   coverFrame: {
-    borderRadius: 0,
+    width: '100%',
+    aspectRatio: 0.69,
+    borderRadius: BorderRadius.md, // 12px
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#000000',
+    backgroundColor: '#F3F4F6',
     position: 'relative',
-    backgroundColor: '#FAF5EE',
+    ...Shadows.bookCover,
   },
   coverImage: {
     width: '100%',
-    height: 200,
+    height: '100%',
   },
-  ratingTag: {
+  crownBadge: {
     position: 'absolute',
-    bottom: 6,
-    left: 6,
-    flexDirection: 'row',
+    top: 6,
+    right: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    gap: 3,
-  },
-  ratingText: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    ...Shadows.sm,
   },
   heartBtn: {
     position: 'absolute',
-    top: -6,
-    right: -6,
-    width: 32,
-    height: 32,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
+    bottom: 6,
+    right: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 10,
-    ...Shadows.sm,
-  },
-  heartBtnActive: {
-    backgroundColor: '#FFA6D5',
   },
   infoSection: {
-    marginTop: 10,
+    paddingTop: 8,
+    paddingHorizontal: 2,
   },
   title: {
-    fontSize: 14,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: -0.3,
+    fontSize: 13.5,
+    fontFamily: Typography.sans.semiBold,
+    color: Colors.text.primary,
+    letterSpacing: -0.2,
   },
   author: {
-    fontSize: 11,
+    fontSize: 11.5,
     fontFamily: Typography.sans.medium,
-    color: '#555555',
+    color: '#8E8E93',
     marginTop: 2,
+    marginBottom: 4,
   },
-  priceRow: {
-    marginTop: 8,
+  metaRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  pricePill: {
-    backgroundColor: '#2EEC96',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+  ratingBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
   },
-  priceText: {
+  ratingText: {
     fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#D97706',
+  },
+  pickedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.xs,
+    gap: 3,
+  },
+  pickedText: {
+    fontSize: 9.5,
+    fontFamily: Typography.sans.semiBold,
+    color: '#6366F1',
   },
 });

@@ -1,74 +1,64 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Bookmark, Heart, Star, BookOpen } from 'lucide-react-native';
+import { Star, Bookmark } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Book } from '@/types/book';
-import { Badge } from '@/components/ui/Badge';
-import { useFavoritesStore } from '@/store/favoritesStore';
 import { useReadingProgressStore } from '@/store/readingProgressStore';
 import { BookReaderModal } from '@/components/product/BookReaderModal';
-import { Shadows, Typography } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 
 interface ContinueReadingCardProps {
   book: Book;
+  fullWidth?: boolean;
 }
 
-export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }) => {
+export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book, fullWidth = false }) => {
   const router = useRouter();
-  const { isFavorite, toggleFavorite } = useFavoritesStore();
-  const favorite = isFavorite(book.id);
   const [readerVisible, setReaderVisible] = useState(false);
 
   const liveProgress = useReadingProgressStore((s) => s.progressMap[book.id]);
-  const progressPercent = liveProgress !== undefined
-    ? liveProgress.progressPercent
-    : (book.readingProgress ?? 0);
-  const currentPage = liveProgress !== undefined
-    ? liveProgress.currentPage
-    : (book.currentPage ?? 1);
+  const progressPercent =
+    liveProgress !== undefined
+      ? liveProgress.progressPercent
+      : (book.readingProgress ?? 40);
 
   const handlePress = () => {
-    router.push({
-      pathname: '/book/[id]',
-      params: { id: book.id },
-    });
+    setReaderVisible(true);
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.container, fullWidth && styles.containerFullWidth]}>
       <Pressable
         onPress={handlePress}
         style={({ pressed }) => [
-          styles.contentPressable,
-          {
-            transform: [
-              { translateX: pressed ? 1.5 : 0 },
-              { translateY: pressed ? 1.5 : 0 },
-            ],
-          },
+          styles.card,
+          fullWidth && styles.cardFullWidth,
+          { opacity: pressed ? 0.95 : 1 },
         ]}
         accessibilityRole="button"
         accessibilityLabel={`Continue reading ${book.title}`}
       >
         {/* Left: Thumbnail Cover */}
-        <View style={styles.coverFrame}>
+        <View style={styles.thumbnailFrame}>
           <Image
             source={{ uri: book.coverImage }}
-            style={styles.coverImage}
+            style={styles.thumbnailImage}
             contentFit="cover"
             transition={200}
           />
         </View>
 
-        {/* Right Details */}
+        {/* Right: Book Details & Slim Progress */}
         <View style={styles.detailsContainer}>
-          {/* Top: READ NOW & Rating */}
-          <View style={styles.topRow}>
-            <Badge label="IN PROGRESS" variant="readNow" />
-            <View style={styles.ratingBadge}>
-              <Star size={10} color="#000000" fill="#FFDE59" />
+          {/* Rating & Bookmark Row */}
+          <View style={styles.topMetaRow}>
+            <View style={styles.ratingBox}>
+              <Star size={10} color="#FBBF24" fill="#FBBF24" />
               <Text style={styles.ratingText}>{book.rating.toFixed(1)}</Text>
+            </View>
+            <View style={styles.bookmarkTag}>
+              <Bookmark size={10} color="#6366F1" fill="#6366F1" />
             </View>
           </View>
 
@@ -79,73 +69,19 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
 
           {/* Author */}
           <Text style={styles.author} numberOfLines={1}>
-            Novel by {book.author}
+            {book.author}
           </Text>
 
-          {/* Progress Bar & Page meta */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[styles.progressBarFill, { width: `${progressPercent}%` }]}
-              />
-            </View>
-            <View style={styles.progressMetaRow}>
-              <Text style={styles.progressText}>
-                {progressPercent}% DONE • Page {currentPage} of {book.pages}
-              </Text>
-
-              {/* Neobrutal Resume Button */}
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation?.();
-                  setReaderVisible(true);
-                }}
-                style={({ pressed }) => [
-                  styles.resumeBtn,
-                  {
-                    transform: [
-                      { translateX: pressed ? 1 : 0 },
-                      { translateY: pressed ? 1 : 0 },
-                    ],
-                  },
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel="Resume reading"
-              >
-                <BookOpen size={11} color="#000000" strokeWidth={2.5} />
-                <Text style={styles.resumeBtnText}>READ</Text>
-              </Pressable>
-            </View>
+          {/* Sleek Minimal Progress Track */}
+          <View style={styles.progressTrack}>
+            <View
+              style={[styles.progressBarFill, { width: `${progressPercent}%` }]}
+            />
           </View>
         </View>
       </Pressable>
 
-      {/* Sibling Heart Overlay button */}
-      <Pressable
-        onPress={() => toggleFavorite(book.id)}
-        hitSlop={8}
-        style={({ pressed }) => [
-          styles.heartOverlay,
-          favorite && styles.heartOverlayActive,
-          {
-            transform: [
-              { translateX: pressed ? 1.5 : 0 },
-              { translateY: pressed ? 1.5 : 0 },
-            ],
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel="Toggle favorite"
-      >
-        <Heart
-          size={13}
-          color="#000000"
-          fill={favorite ? '#FF6B4A' : '#FFFFFF'}
-          strokeWidth={2.5}
-        />
-      </Pressable>
-
-      {/* In-App E-Reader Modal */}
+      {/* Reader Modal */}
       <BookReaderModal
         visible={readerVisible}
         onClose={() => setReaderVisible(false)}
@@ -153,41 +89,44 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book }
         title={book.title}
         author={book.author}
         coverImage={book.coverImage}
-        onBuyPress={handlePress}
+        onBuyPress={() => router.push({ pathname: '/book/[id]', params: { id: book.id } })}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginRight: 14,
+  },
+  containerFullWidth: {
+    marginRight: 0,
+    width: '100%',
+  },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 0,
+    borderRadius: BorderRadius.lg, // 16px
     padding: 12,
-    marginHorizontal: 20,
-    marginBottom: 14,
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    position: 'relative',
-    ...Shadows.card,
-  },
-  contentPressable: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    width: 240,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    ...Shadows.card,
   },
-  coverFrame: {
-    width: 72,
-    height: 100,
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
+  cardFullWidth: {
+    width: '100%',
+  },
+  thumbnailFrame: {
+    width: 48,
+    height: 68,
+    borderRadius: BorderRadius.xs, // 6px
     overflow: 'hidden',
-    backgroundColor: '#FAF5EE',
-    marginRight: 14,
+    backgroundColor: '#F3F4F6',
+    marginRight: 12,
     ...Shadows.sm,
   },
-  coverImage: {
+  thumbnailImage: {
     width: '100%',
     height: '100%',
   },
@@ -195,99 +134,48 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  topRow: {
+  topMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
+    gap: 6,
+    marginBottom: 4,
   },
-  ratingBadge: {
+  ratingBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    borderRadius: 0,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
     gap: 3,
   },
   ratingText: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontSize: 10.5,
+    fontFamily: Typography.sans.semiBold,
+    color: '#D97706',
+  },
+  bookmarkTag: {
+    padding: 2,
   },
   title: {
-    fontSize: 15,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: -0.3,
+    fontSize: 13,
+    fontFamily: Typography.sans.semiBold,
+    color: Colors.text.primary,
+    letterSpacing: -0.2,
   },
   author: {
-    fontSize: 12,
-    fontFamily: Typography.sans.medium,
-    color: '#555555',
-    marginTop: 2,
+    fontSize: 11,
+    fontFamily: Typography.sans.regular,
+    color: '#8E8E93',
+    marginTop: 1,
+    marginBottom: 6,
   },
-  progressContainer: {
-    marginTop: 8,
-  },
-  progressBarBackground: {
-    height: 8,
-    backgroundColor: '#F0EBE0',
-    borderRadius: 0,
-    borderWidth: 1.5,
-    borderColor: '#000000',
+  progressTrack: {
+    height: 3.5,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 2,
     overflow: 'hidden',
+    width: '100%',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#2EEC96',
-  },
-  progressMetaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 6,
-  },
-  progressText: {
-    fontSize: 10,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-  },
-  resumeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFDE59',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    gap: 4,
-    borderRadius: 0,
-    ...Shadows.sm,
-  },
-  resumeBtnText: {
-    fontSize: 9,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-  },
-  heartOverlay: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    width: 28,
-    height: 28,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-    ...Shadows.sm,
-  },
-  heartOverlayActive: {
-    backgroundColor: '#FFA6D5',
+    backgroundColor: Colors.primary, // Golden amber #D97706
+    borderRadius: 2,
   },
 });

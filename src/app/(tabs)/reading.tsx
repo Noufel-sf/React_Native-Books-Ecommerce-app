@@ -7,7 +7,7 @@ import { BookCard } from '@/components/product/BookCard';
 import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
 import { BOOKS, CONTINUE_READING_BOOKS } from '@/data/books';
 import { useFavoritesStore } from '@/store/favoritesStore';
-import { Typography, Shadows } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { SwipeToDeleteRow } from '@/components/gestures/SwipeToDeleteRow';
 
 export default function ReadingScreen() {
@@ -59,7 +59,7 @@ export default function ReadingScreen() {
               deleteLabel="REMOVE"
               onDelete={() => setReadingList((prev) => prev.filter((b) => b.id !== item.id))}
             >
-              <ContinueReadingCard book={item} />
+              <ContinueReadingCard book={item} fullWidth />
             </SwipeToDeleteRow>
           )}
           contentContainerStyle={styles.listContent}
@@ -112,115 +112,105 @@ export default function ReadingScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAF5EE',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 12,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: '#FFFFFF',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: -0.5,
+    color: Colors.text.primary,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontFamily: Typography.sans.medium,
-    color: '#555555',
+    color: '#8E8E93',
     marginTop: 2,
-    marginBottom: 14,
+    marginBottom: 12,
   },
   tabToggle: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    borderWidth: 2.5,
-    borderColor: '#000000',
+    backgroundColor: '#F3F4F6',
+    borderRadius: BorderRadius.full,
     padding: 3,
-    ...Shadows.sm,
   },
   toggleBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 7,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: BorderRadius.full,
   },
   toggleBtnActive: {
-    backgroundColor: '#FFDE59',
-    borderWidth: 1.5,
-    borderColor: '#000000',
+    backgroundColor: '#FFFFFF',
+    ...Shadows.sm,
   },
   toggleText: {
     fontSize: 12,
     fontFamily: Typography.sans.medium,
-    color: '#555555',
+    color: '#8E8E93',
   },
   toggleTextActive: {
-    color: '#000000',
+    color: Colors.primary,
     fontFamily: Typography.sans.bold,
   },
   listContent: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
+    paddingTop: 12,
     paddingBottom: 100,
-    gap: 14,
+    gap: 12,
   },
   columnWrapper: {
-    gap: 10,
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
   gridItem: {
-    flex: 1,
+    width: '48%',
   },
   emptyContainer: {
-    padding: 24,
+    padding: 28,
     marginHorizontal: 20,
-    marginTop: 40,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 0,
+    marginTop: 30,
+    backgroundColor: '#F9FAFB',
+    borderRadius: BorderRadius.xl,
     alignItems: 'center',
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    ...Shadows.card,
   },
   emptyIconBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FEF3C7',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#000000',
-    marginBottom: 16,
-    ...Shadows.sm,
+    marginBottom: 14,
   },
   emptyTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: Colors.text.primary,
     marginBottom: 6,
   },
   emptySubtitle: {
     fontSize: 13,
-    fontFamily: Typography.sans.medium,
-    color: '#555555',
+    fontFamily: Typography.sans.regular,
+    color: '#8E8E93',
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 18,
+    lineHeight: 19,
+    marginBottom: 16,
   },
   exploreBtn: {
-    backgroundColor: '#FFDE59',
-    borderRadius: 0,
-    borderWidth: 2.5,
-    borderColor: '#000000',
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    ...Shadows.button,
   },
   exploreBtnText: {
     fontSize: 13,
     fontFamily: Typography.sans.bold,
-    color: '#000000',
+    color: '#FFFFFF',
   },
 });

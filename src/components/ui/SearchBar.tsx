@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, TextInput, Pressable, StyleSheet, Platform } from 'react-native';
-import { Search, SlidersHorizontal, X } from 'lucide-react-native';
+import { Search, ArrowUpDown, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { Shadows, Typography } from '@/constants/theme';
+import { Colors, Typography, BorderRadius } from '@/constants/theme';
 
 interface SearchBarProps {
   value: string;
@@ -16,7 +16,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
   onFilterPress,
-  placeholder = 'Search books, authors, genres...',
+  placeholder = 'Search Book',
   autoFocus = false,
 }) => {
   const handleClear = () => {
@@ -28,16 +28,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <View style={styles.container}>
-      <Search size={20} color="#000000" strokeWidth={2.5} style={styles.searchIcon} />
+      {/* Left Search Icon */}
+      <Search size={18} color="#9CA3AF" strokeWidth={2.2} style={styles.searchIcon} />
+
+      {/* Text Input */}
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#777777"
+        placeholderTextColor="#9CA3AF"
         style={styles.input}
         autoFocus={autoFocus}
         returnKeyType="search"
       />
+
+      {/* Clear (X) Button */}
       {value.length > 0 && (
         <Pressable
           onPress={handleClear}
@@ -46,25 +51,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Clear search"
         >
-          <X size={15} color="#000000" strokeWidth={2.5} />
+          <X size={15} color="#9CA3AF" strokeWidth={2} />
         </Pressable>
       )}
+
+      {/* Right Sort/Filter Icon (ArrowUpDown) */}
       {onFilterPress && (
         <Pressable
           onPress={onFilterPress}
-          style={({ pressed }) => [
-            styles.filterButton,
-            {
-              transform: [
-                { translateX: pressed ? 1.5 : 0 },
-                { translateY: pressed ? 1.5 : 0 },
-              ],
-            },
-          ]}
+          style={styles.filterButton}
+          hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel="Open filters"
+          accessibilityLabel="Sort or filter books"
         >
-          <SlidersHorizontal size={18} color="#000000" strokeWidth={2.5} />
+          <ArrowUpDown size={17} color="#6B7280" strokeWidth={2.2} />
         </Pressable>
       )}
     </View>
@@ -75,14 +75,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    paddingLeft: 14,
-    paddingRight: 6,
-    paddingVertical: 6,
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    ...Shadows.card,
+    backgroundColor: Colors.surfaceGray, // #F3F4F6
+    borderRadius: BorderRadius.full,     // 9999px rounded pill
+    paddingHorizontal: 16,
+    height: 48,
   },
   searchIcon: {
     marginRight: 10,
@@ -91,22 +87,18 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontFamily: Typography.sans.medium,
-    color: '#000000',
-    paddingVertical: 6,
+    color: Colors.text.primary,
+    paddingVertical: 8,
   },
   clearBtn: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },
   filterButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 0,
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
+    paddingLeft: 8,
+    paddingVertical: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },

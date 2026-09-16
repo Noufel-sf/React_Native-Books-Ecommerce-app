@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
 import { Star, ThumbsUp, CheckCircle2, MessageSquare } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
-import { Typography, Shadows } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { useReviewsStore, BookReview } from '@/store/reviewsStore';
 
 interface ReviewsFeedProps {
@@ -100,10 +100,10 @@ export const ReviewsFeed: React.FC<ReviewsFeedProps> = ({
               {[1, 2, 3, 4, 5].map((s) => (
                 <Star
                   key={s}
-                  size={14}
-                  color="#000000"
-                  fill={s <= review.rating ? '#FFDE59' : '#FFFFFF'}
-                  strokeWidth={2}
+                  size={13}
+                  color={s <= review.rating ? '#FBBF24' : '#E5E7EB'}
+                  fill={s <= review.rating ? '#FBBF24' : 'transparent'}
+                  strokeWidth={1.5}
                 />
               ))}
             </View>
@@ -157,9 +157,9 @@ const styles = StyleSheet.create({
   },
   reviewCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 0,
-    borderWidth: 2.5,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
     padding: 16,
     ...Shadows.card,
   },
@@ -177,54 +177,48 @@ const styles = StyleSheet.create({
   avatar: {
     width: 36,
     height: 36,
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
+    borderRadius: BorderRadius.full,
   },
   avatarFallback: {
     width: 36,
     height: 36,
-    borderRadius: 0,
-    borderWidth: 2,
-    borderColor: '#000000',
-    backgroundColor: '#FFDE59',
+    borderRadius: BorderRadius.full,
+    backgroundColor: '#FEF3C7',
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarInitial: {
     fontSize: 14,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#D97706',
   },
   userMeta: {
     gap: 1,
   },
   userName: {
     fontSize: 13,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#1A1A1A',
   },
   reviewDate: {
     fontSize: 11,
-    fontFamily: Typography.sans.medium,
-    color: '#777777',
+    fontFamily: Typography.sans.regular,
+    color: '#9CA3AF',
   },
   verifiedBadge: {
-    backgroundColor: '#2EEC96',
-    borderWidth: 1.5,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#ECFDF5',
+    borderRadius: BorderRadius.full,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     paddingVertical: 3,
     gap: 4,
   },
   verifiedText: {
-    fontSize: 9,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 9.5,
+    fontFamily: Typography.sans.medium,
+    color: '#059669',
+    letterSpacing: 0.3,
   },
   starsRow: {
     flexDirection: 'row',
@@ -234,50 +228,50 @@ const styles = StyleSheet.create({
   },
   reviewHeadline: {
     fontSize: 14,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#1A1A1A',
     marginBottom: 6,
     lineHeight: 19,
   },
   reviewBody: {
     fontSize: 13,
-    fontFamily: Typography.sans.medium,
-    color: '#333333',
-    lineHeight: 19,
+    fontFamily: Typography.sans.regular,
+    color: '#4B5563',
+    lineHeight: 20,
     marginBottom: 12,
   },
   footerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderTopWidth: 1.5,
-    borderTopColor: '#EEEEEE',
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
     paddingTop: 10,
   },
   helpfulBtn: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#F9FAFB',
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     paddingHorizontal: 10,
     paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    ...Shadows.sm,
   },
   helpfulBtnActive: {
-    backgroundColor: '#FFDE59',
+    backgroundColor: '#FEF3C7',
+    borderColor: '#FDE68A',
   },
   helpfulText: {
     fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.medium,
+    color: '#4B5563',
   },
   emptyCard: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 2.5,
-    borderColor: '#000000',
-    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    borderRadius: BorderRadius.lg,
     padding: 20,
     alignItems: 'center',
     marginTop: 14,
@@ -286,41 +280,35 @@ const styles = StyleSheet.create({
   emptyIconBox: {
     width: 48,
     height: 48,
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#FEF3C7',
+    borderRadius: BorderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
-    ...Shadows.sm,
   },
   emptyTitle: {
     fontSize: 15,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
+    fontFamily: Typography.sans.semiBold,
+    color: '#1A1A1A',
   },
   emptySubtitle: {
     fontSize: 12,
-    fontFamily: Typography.sans.medium,
-    color: '#666666',
+    fontFamily: Typography.sans.regular,
+    color: '#6B7280',
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 14,
   },
   emptyWriteBtn: {
-    backgroundColor: '#FFDE59',
-    borderWidth: 2,
-    borderColor: '#000000',
-    borderRadius: 0,
+    backgroundColor: '#D97706',
+    borderRadius: BorderRadius.md,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    ...Shadows.button,
+    paddingVertical: 9,
+    ...Shadows.card,
   },
   emptyWriteBtnText: {
-    fontSize: 11,
-    fontFamily: Typography.sans.bold,
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 12,
+    fontFamily: Typography.sans.semiBold,
+    color: '#FFFFFF',
   },
 });
