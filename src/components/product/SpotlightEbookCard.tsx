@@ -76,18 +76,10 @@ export const SpotlightEbookCard: React.FC<SpotlightEbookCardProps> = ({ book }) 
           {/* Price */}
           <Text style={styles.priceText}>${book.price.toFixed(2)}</Text>
 
-          {/* Cyber Yellow Detail Pill Button */}
-          <Pressable
-            onPress={handlePress}
-            style={({ pressed }) => [
-              styles.detailBtn,
-              { transform: [{ scale: pressed ? 0.94 : 1 }] },
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="Detail"
-          >
+          {/* Cyber Yellow Detail Pill Button Badge */}
+          <View style={styles.detailBtn}>
             <Text style={styles.detailBtnText}>Detail</Text>
-          </Pressable>
+          </View>
         </View>
       </Pressable>
     </View>
