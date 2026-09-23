@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TextInput, Pressable, StyleSheet, Platform } from 'react-native';
 import { Search, ArrowUpDown, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { Colors, Typography, BorderRadius } from '@/constants/theme';
+import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
 
 interface SearchBarProps {
   value: string;
@@ -16,7 +16,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
   onFilterPress,
-  placeholder = 'Search Book',
+  placeholder = 'Search by title, author, or genre...',
   autoFocus = false,
 }) => {
   const handleClear = () => {
@@ -64,7 +64,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Sort or filter books"
         >
-          <ArrowUpDown size={17} color="#6B7280" strokeWidth={2.2} />
+          <View style={styles.filterIconCircle}>
+            <ArrowUpDown size={15} color={Colors.primary} strokeWidth={2.2} />
+          </View>
         </Pressable>
       )}
     </View>
@@ -75,10 +77,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceGray, // #F3F4F6
-    borderRadius: BorderRadius.full,     // 9999px rounded pill
+    backgroundColor: '#FFFFFF',
+    borderRadius: BorderRadius.full,
     paddingHorizontal: 16,
     height: 48,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+    ...Shadows.sm,
   },
   searchIcon: {
     marginRight: 10,
@@ -97,8 +102,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterButton: {
-    paddingLeft: 8,
-    paddingVertical: 6,
+    paddingLeft: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterIconCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#FEF3C7',
     justifyContent: 'center',
     alignItems: 'center',
   },

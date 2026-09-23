@@ -1,192 +1,194 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  FlatList,
-  StatusBar,
-  RefreshControl,
-  Platform,
   ScrollView,
   Pressable,
+  StyleSheet,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
+import { ArrowLeft, ArrowRight, MoreHorizontal, Star } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { SearchBar } from '@/components/ui/SearchBar';
-import { BookCard } from '@/components/product/BookCard';
-import { BookSkeletonCard } from '@/components/ui/SkeletonLoader';
-import { FilterModal, FilterOptions } from '@/components/ui/FilterModal';
 import { BOOKS } from '@/data/books';
-import { Colors, Typography, BorderRadius } from '@/constants/theme';
-import { SearchX, RotateCcw } from 'lucide-react-native';
-
-const FILTER_TABS = ['All Result', 'Free', 'Premium', 'Author', 'Genre'];
+import { Typography, BorderRadius } from '@/constants/theme';
 
 export default function ExploreScreen() {
-  const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('All Result');
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [filters, setFilters] = useState<FilterOptions>({
-    format: 'All',
-    sortBy: 'popular',
-  });
+  const router = useRouter();
 
-  const onRefresh = useCallback(() => {
-    setIsRefreshing(true);
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-    }
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 900);
-  }, []);
+  // Reference featured book for "Top E-Book Reading"
+  const topEbook =
+    BOOKS.find((b) => b.id === 'muscle-trovelutions') ??
+    BOOKS[3];
 
-  const handleTabPress = (tab: string) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync().catch(() => {});
-    }
-    setActiveTab(tab);
+  // More Recommended books
+  const recommendedBooks = BOOKS.filter((b) => b.id !== topEbook.id);
+
+  const handleBack = () => {
+    router.replace('/(tabs)');
   };
 
-  const filteredBooks = useMemo(() => {
-    let result = BOOKS.filter((b) => {
-      const matchesQuery =
-        !query.trim() ||
-        b.title.toLowerCase().includes(query.toLowerCase()) ||
-        b.author.toLowerCase().includes(query.toLowerCase()) ||
-        b.genres.some((g) => g.toLowerCase().includes(query.toLowerCase()));
-
-      let matchesTab = true;
-      if (activeTab === 'Free') {
-        matchesTab = b.price < 16;
-      } else if (activeTab === 'Premium') {
-        matchesTab = b.price >= 18;
-      } else if (activeTab === 'Genre') {
-        matchesTab = b.genres.includes('Self-Help') || b.genres.includes('Fiction');
-      }
-
-      return matchesQuery && matchesTab;
-    });
-
-    if (filters.sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
-    } else if (filters.sortBy === 'priceAsc') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (filters.sortBy === 'priceDesc') {
-      result.sort((a, b) => b.price - a.price);
-    }
-
-    return result;
-  }, [query, activeTab, filters]);
-
-  const handleResetFilters = () => {
+  const handleBookPress = (id: string) => {
     if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      Haptics.selectionAsync?.().catch?.(() => {});
     }
-    setQuery('');
-    setActiveTab('All Result');
+    router.push({
+      pathname: '/book/[id]',
+      params: { id },
+    });
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
-      {/* Top Search Bar */}
-      <View style={styles.searchSection}>
-        <SearchBar
-          value={query}
-          onChangeText={setQuery}
-          onFilterPress={() => setIsFilterVisible(true)}
-          placeholder="Search Book"
-        />
-      </View>
-
-      {/* Quick Filter Tabs (All Result, Free, Premium, Author, Genre) */}
-      <View style={styles.tabsSection}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsScroll}
+      {/* Screen 3: Top Navigation Bar */}
+      <View style={styles.header}>
+        {/* Cyan Circular Back Button */}
+        <Pressable
+          onPress={handleBack}
+          style={({ pressed }) => [
+            styles.backCircle,
+            { transform: [{ scale: pressed ? 0.94 : 1 }] },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
         >
-          {FILTER_TABS.map((tab) => {
-            const isSelected = activeTab === tab;
-            return (
-              <Pressable
-                key={tab}
-                onPress={() => handleTabPress(tab)}
-                style={styles.tabItem}
-                hitSlop={6}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    isSelected ? styles.tabTextActive : styles.tabTextInactive,
-                  ]}
-                >
-                  {tab}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+          <ArrowLeft size={18} color="#18181B" strokeWidth={2.4} />
+        </Pressable>
+
+        {/* Center Title */}
+        <Text style={styles.headerTitle}>More Book</Text>
+
+        {/* Right Options */}
+        <Pressable
+          onPress={() => {
+            Haptics.selectionAsync?.().catch?.(() => {});
+          }}
+          style={styles.moreButton}
+          accessibilityRole="button"
+          accessibilityLabel="Options"
+        >
+          <MoreHorizontal size={22} color="#18181B" strokeWidth={2.4} />
+        </Pressable>
       </View>
 
-      {/* 2-Column Books Grid */}
-      {isRefreshing ? (
-        <View style={styles.skeletonGrid}>
-          <View style={styles.skeletonCol}>
-            <BookSkeletonCard width="100%" />
-            <BookSkeletonCard width="100%" />
-          </View>
-          <View style={styles.skeletonCol}>
-            <BookSkeletonCard width="100%" />
-            <BookSkeletonCard width="100%" />
-          </View>
-        </View>
-      ) : filteredBooks.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <SearchX size={36} color="#9CA3AF" />
-          <Text style={styles.emptyTitle}>No Books Found</Text>
-          <Text style={styles.emptySubtitle}>
-            We couldn't find any titles matching "{query}".
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Screen 3: Top E-Book Reading Spotlight Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Top E-Book Reading</Text>
+          <Text style={styles.sectionSubtitle}>
+            This top e-book for you, we have many type for you needed ( science, design, & busines )
           </Text>
-          <Pressable onPress={handleResetFilters} style={styles.resetBtn}>
-            <RotateCcw size={14} color="#FFFFFF" />
-            <Text style={styles.resetBtnText}>Clear Filters</Text>
-          </Pressable>
         </View>
-      ) : (
-        <FlatList
-          data={filteredBooks}
-          numColumns={2}
-          keyExtractor={(item) => item.id}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.gridContent}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={onRefresh}
-              tintColor={Colors.primary}
-              colors={[Colors.primary]}
-            />
-          }
-          renderItem={({ item }) => (
-            <View style={styles.gridItem}>
-              <BookCard book={item} width="100%" />
-            </View>
-          )}
-        />
-      )}
 
-      {/* Filter Bottom Sheet Modal */}
-      <FilterModal
-        visible={isFilterVisible}
-        onClose={() => setIsFilterVisible(false)}
-        currentFilters={filters}
-        onApply={setFilters}
-      />
+        {/* Spotlight Card with Yellow Detail Button */}
+        <View style={styles.spotlightCard}>
+          {/* Book Cover with 1.8px Black Border */}
+          <View style={styles.spotlightCoverFrame}>
+            <Image
+              source={{ uri: topEbook.coverImage }}
+              style={styles.spotlightCoverImage}
+              contentFit="cover"
+            />
+          </View>
+
+          {/* Book Details */}
+          <View style={styles.spotlightDetails}>
+            <Text style={styles.spotlightTitle} numberOfLines={2}>
+              {topEbook.title}
+            </Text>
+            <Text style={styles.spotlightAuthor}>By {topEbook.author}</Text>
+
+            {/* Stars */}
+            <View style={styles.starsRow}>
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={12}
+                  color="#FBBF24"
+                  fill={i < Math.round(topEbook.rating) ? '#FBBF24' : 'transparent'}
+                />
+              ))}
+            </View>
+
+            {/* Price */}
+            <Text style={styles.spotlightPrice}>${topEbook.price.toFixed(2)}</Text>
+
+            {/* Cyber Yellow Pill Detail Button */}
+            <Pressable
+              onPress={() => handleBookPress(topEbook.id)}
+              style={({ pressed }) => [
+                styles.detailBtn,
+                { transform: [{ scale: pressed ? 0.96 : 1 }] },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={`View details for ${topEbook.title}`}
+            >
+              <Text style={styles.detailBtnText}>Detail</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Screen 3: More Recommended Section */}
+        <View style={styles.recommendedContainer}>
+          <View style={styles.recommendedHeader}>
+            <Text style={styles.recommendedTitle}>More Recomended</Text>
+            <Pressable
+              onPress={() => {}}
+              style={({ pressed }) => [
+                styles.arrowBox,
+                { transform: [{ scale: pressed ? 0.92 : 1 }] },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="View more recommended"
+            >
+              <ArrowRight size={16} color="#18181B" strokeWidth={2.4} />
+            </Pressable>
+          </View>
+
+          {/* 2-Column Grid of Recommended Books */}
+          <View style={styles.booksGrid}>
+            {recommendedBooks.map((b) => (
+              <Pressable
+                key={b.id}
+                onPress={() => handleBookPress(b.id)}
+                style={({ pressed }) => [
+                  styles.gridCard,
+                  { transform: [{ scale: pressed ? 0.97 : 1 }] },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`View ${b.title}`}
+              >
+                <View style={styles.gridCoverFrame}>
+                  <Image
+                    source={{ uri: b.coverImage }}
+                    style={styles.gridCoverImage}
+                    contentFit="cover"
+                  />
+                </View>
+                <View style={styles.gridInfo}>
+                  <Text style={styles.gridAuthor} numberOfLines={1}>
+                    By {b.author}
+                  </Text>
+                  <Text style={styles.gridTitle} numberOfLines={1}>
+                    {b.title}
+                  </Text>
+                  <Text style={styles.gridPrice}>${b.price.toFixed(2)}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        <View style={{ height: 100 }} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -196,92 +198,204 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  searchSection: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 8,
-  },
-  tabsSection: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  tabsScroll: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignItems: 'center',
-    gap: 22,
-  },
-  tabItem: {
-    paddingVertical: 4,
-  },
-  tabText: {
-    fontSize: 14,
-    letterSpacing: -0.2,
-  },
-  tabTextActive: {
-    fontFamily: Typography.sans.bold,
-    color: Colors.primary, // Golden Amber #D97706
-  },
-  tabTextInactive: {
-    fontFamily: Typography.sans.medium,
-    color: '#8E8E93',
-  },
-  gridContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 100,
-  },
-  columnWrapper: {
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  gridItem: {
-    width: '47.5%',
-  },
-  skeletonGrid: {
+  header: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 16,
-    gap: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
   },
-  skeletonCol: {
-    flex: 1,
-    gap: 16,
-  },
-  emptyContainer: {
-    flex: 1,
+  backCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#38BDF8', // Cyan Blue from mockup
+    borderWidth: 1.8,
+    borderColor: '#18181B',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingBottom: 60,
   },
-  emptyTitle: {
+  headerTitle: {
+    fontSize: 15.5,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+  },
+  moreButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingBottom: 110,
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
+  },
+  sectionHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    marginBottom: 14,
+  },
+  sectionTitle: {
     fontSize: 18,
     fontFamily: Typography.sans.bold,
-    color: Colors.text.primary,
-    marginTop: 14,
-    marginBottom: 6,
+    color: '#18181B',
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
-  emptySubtitle: {
-    fontSize: 13,
+  sectionSubtitle: {
+    fontSize: 12,
     fontFamily: Typography.sans.regular,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 19,
-    marginBottom: 20,
+    color: '#6B7280',
+    lineHeight: 18,
   },
-  resetBtn: {
+  spotlightCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: BorderRadius.full,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    borderRadius: 24,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    padding: 14,
+    marginBottom: 24,
   },
-  resetBtnText: {
-    fontSize: 13,
+  spotlightCoverFrame: {
+    width: 104,
+    height: 146,
+    borderRadius: 14,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
+  },
+  spotlightCoverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  spotlightDetails: {
+    flex: 1,
+    marginLeft: 16,
+    justifyContent: 'center',
+  },
+  spotlightTitle: {
+    fontSize: 15,
     fontFamily: Typography.sans.bold,
-    color: '#FFFFFF',
+    color: '#18181B',
+    lineHeight: 20,
+    marginBottom: 3,
+  },
+  spotlightAuthor: {
+    fontSize: 11.5,
+    fontFamily: Typography.sans.medium,
+    color: '#6B7280',
+    marginBottom: 6,
+  },
+  starsRow: {
+    flexDirection: 'row',
+    gap: 3,
+    marginBottom: 6,
+  },
+  spotlightPrice: {
+    fontSize: 15,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+    marginBottom: 10,
+  },
+  detailBtn: {
+    backgroundColor: '#FFD027', // Cyber Yellow from mockup
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    paddingVertical: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 110,
+  },
+  detailBtnText: {
+    fontSize: 12.5,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+  },
+  recommendedContainer: {
+    paddingHorizontal: 20,
+  },
+  recommendedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+  recommendedTitle: {
+    fontSize: 16,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+  },
+  arrowBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  booksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  gridCard: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    padding: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  gridCoverFrame: {
+    width: '100%',
+    aspectRatio: 0.72,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  gridCoverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  gridInfo: {
+    width: '100%',
+    marginTop: 8,
+    paddingHorizontal: 2,
+  },
+  gridAuthor: {
+    fontSize: 10,
+    fontFamily: Typography.sans.medium,
+    color: '#6B7280',
+  },
+  gridTitle: {
+    fontSize: 12.5,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+    marginTop: 2,
+  },
+  gridPrice: {
+    fontSize: 12.5,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+    marginTop: 4,
   },
 });

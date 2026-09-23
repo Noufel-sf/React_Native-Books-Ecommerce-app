@@ -5,7 +5,7 @@ import { Book, BookFormat, CartItem } from '@/types/book';
 
 interface CartState {
   items: CartItem[];
-  addItem: (book: Book, format: BookFormat) => void;
+  addItem: (book: Book, format: BookFormat, quantity?: number) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -20,7 +20,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
 
-      addItem: (book: Book, format: BookFormat) => {
+      addItem: (book: Book, format: BookFormat, quantity = 1) => {
         const { items } = get();
         const itemId = `${book.id}-${format}`;
         const existingItem = items.find((i) => i.id === itemId);
@@ -28,7 +28,7 @@ export const useCartStore = create<CartState>()(
         if (existingItem) {
           set({
             items: items.map((i) =>
-              i.id === itemId ? { ...i, quantity: i.quantity + 1 } : i
+              i.id === itemId ? { ...i, quantity: i.quantity + quantity } : i
             ),
           });
         } else {
@@ -39,7 +39,7 @@ export const useCartStore = create<CartState>()(
                 id: itemId,
                 book,
                 format,
-                quantity: 1,
+                quantity,
                 price: book.price,
               },
             ],

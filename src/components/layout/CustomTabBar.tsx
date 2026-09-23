@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Home, Search, BookMarked, User, ShoppingBag } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
+import { Home, Compass, BookMarked, User, ShoppingBag } from 'lucide-react-native';
 import { useCartStore } from '@/store/cartStore';
-import { Colors, Typography } from '@/constants/theme';
+import { Typography, BorderRadius, Shadows } from '@/constants/theme';
 
 export type CustomTabBarProps = Parameters<
   NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>
@@ -18,40 +19,40 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   const insets = useSafeAreaInsets();
   const totalCartItems = useCartStore((s) => s.getTotalItems());
 
-  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 14 : 8);
+  const bottomOffset = Math.max(insets.bottom, Platform.OS === 'ios' ? 14 : 12);
 
   const getTabDetails = (routeName: string, isFocused: boolean) => {
-    const activeColor = Colors.primary; // #D97706
-    const inactiveColor = '#9CA3AF';
+    const activeColor = '#18181B'; // Black inside yellow pill
+    const inactiveColor = '#FFFFFF'; // White icons on orange bar
     const color = isFocused ? activeColor : inactiveColor;
-    const size = 22;
-    const strokeWidth = isFocused ? 2.4 : 1.8;
+    const size = 19;
+    const strokeWidth = 2.4;
 
     switch (routeName) {
       case 'index':
         return {
           label: 'Home',
-          icon: <Home size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+          icon: <Home size={size} color={color} strokeWidth={strokeWidth} />,
         };
       case 'explore':
         return {
-          label: 'Search',
-          icon: <Search size={size} color={color} strokeWidth={strokeWidth} />,
+          label: 'Explore',
+          icon: <Compass size={size} color={color} strokeWidth={strokeWidth} />,
         };
       case 'reading':
         return {
           label: 'Library',
-          icon: <BookMarked size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+          icon: <BookMarked size={size} color={color} strokeWidth={strokeWidth} />,
         };
       case 'cart':
         return {
           label: 'Cart',
-          icon: <ShoppingBag size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+          icon: <ShoppingBag size={size} color={color} strokeWidth={strokeWidth} />,
         };
       case 'profile':
         return {
           label: 'Account',
-          icon: <User size={size} color={color} strokeWidth={strokeWidth} fill={isFocused ? activeColor : 'none'} />,
+          icon: <User size={size} color={color} strokeWidth={strokeWidth} />,
         };
       default:
         return {
@@ -62,13 +63,18 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   };
 
   return (
-    <View style={[styles.tabBarContainer, { paddingBottom: bottomPadding }]}>
-      <View style={styles.tabsRow}>
+    <View style={[styles.floatingWrapper, { bottom: bottomOffset }]} pointerEvents="box-none">
+      {/* Tangerine Coral Pill Bar with Solid Black Border */}
+      <View style={styles.dockBar}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
 
           const onPress = () => {
+            if (Platform.OS !== 'web') {
+              Haptics.impactAsync?.(Haptics.ImpactFeedbackStyle.Light).catch?.(() => {});
+            }
+
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
@@ -82,19 +88,40 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 
           const { label, icon } = getTabDetails(route.name, isFocused);
 
+          if (isFocused) {
+            // Cyber Yellow Active Capsule Pill
+            return (
+              <Pressable
+                key={route.key}
+                onPress={onPress}
+                style={({ pressed }) => [
+                  styles.activePill,
+                  { transform: [{ scale: pressed ? 0.96 : 1 }] },
+                ]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: true }}
+                accessibilityLabel={label}
+              >
+                {icon}
+                <Text style={styles.activePillText}>{label}</Text>
+              </Pressable>
+            );
+          }
+
+          // Inactive Minimalist White Icon
           return (
             <Pressable
               key={route.key}
               onPress={onPress}
               style={({ pressed }) => [
-                styles.tabItem,
-                { opacity: pressed ? 0.7 : 1 },
+                styles.inactiveTab,
+                { transform: [{ scale: pressed ? 0.92 : 1 }] },
               ]}
               accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityState={{ selected: false }}
               accessibilityLabel={label}
             >
-              <View style={styles.iconWrapper}>
+              <View style={styles.iconContainer}>
                 {icon}
                 {route.name === 'cart' && totalCartItems > 0 && (
                   <View style={styles.badge}>
@@ -104,15 +131,6 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
                   </View>
                 )}
               </View>
-
-              <Text
-                style={[
-                  styles.tabLabel,
-                  isFocused ? styles.tabLabelActive : styles.tabLabelInactive,
-                ]}
-              >
-                {label}
-              </Text>
             </Pressable>
           );
         })}
@@ -122,62 +140,71 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 };
 
 const styles = StyleSheet.create({
-  tabBarContainer: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 8,
+  floatingWrapper: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    alignItems: 'center',
+    zIndex: 999,
   },
-  tabsRow: {
+  dockBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingTop: 8,
+    justifyContent: 'space-between',
+    backgroundColor: '#FF6B4A', // Tangerine Orange from mockup
+    borderRadius: BorderRadius.full,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    width: '100%',
+    maxWidth: 420,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    ...Shadows.popSm,
   },
-  tabItem: {
-    flex: 1,
+  activePill: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 2,
+    backgroundColor: '#FFD027', // Cyber Sunshine Yellow from mockup
+    borderRadius: BorderRadius.full,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    gap: 6,
   },
-  iconWrapper: {
-    position: 'relative',
-    height: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabLabel: {
-    fontSize: 10.5,
-    marginTop: 4,
-    letterSpacing: -0.1,
-  },
-  tabLabelActive: {
+  activePillText: {
+    fontSize: 12.5,
     fontFamily: Typography.sans.bold,
-    color: Colors.primary, // Golden amber #D97706
+    color: '#18181B',
   },
-  tabLabelInactive: {
-    fontFamily: Typography.sans.medium,
-    color: '#9CA3AF',
+  inactiveTab: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   badge: {
     position: 'absolute',
     top: -4,
-    right: -8,
-    backgroundColor: '#EF4444',
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
+    right: -6,
+    backgroundColor: '#18181B',
+    minWidth: 15,
+    height: 15,
+    borderRadius: 7.5,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 3,
+    paddingHorizontal: 2,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
   },
   badgeText: {
     color: '#FFFFFF',
-    fontSize: 9,
+    fontSize: 8,
     fontFamily: Typography.sans.bold,
   },
 });

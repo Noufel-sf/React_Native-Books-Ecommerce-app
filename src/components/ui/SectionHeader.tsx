@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { ChevronRight } from 'lucide-react-native';
-import { Colors, Typography } from '@/constants/theme';
+import { ArrowRight } from 'lucide-react-native';
+import { Typography } from '@/constants/theme';
 
 interface SectionHeaderProps {
   title: string;
@@ -17,17 +17,18 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      {actionText && (
+      {onActionPress && (
         <Pressable
           onPress={onActionPress}
           style={({ pressed }) => [
-            styles.actionButton,
-            { opacity: pressed ? 0.75 : 1 },
+            styles.arrowButton,
+            { transform: [{ scale: pressed ? 0.92 : 1 }] },
           ]}
           hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={`View all ${title}`}
         >
-          <Text style={styles.actionText}>{actionText}</Text>
-          <ChevronRight size={14} color={Colors.primary} strokeWidth={2.2} />
+          <ArrowRight size={16} color="#18181B" strokeWidth={2.4} />
         </Pressable>
       )}
     </View>
@@ -41,22 +42,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     marginBottom: 12,
-    marginTop: 18,
+    marginTop: 10,
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: 16.5,
     fontFamily: Typography.sans.bold,
-    color: Colors.text.primary,
-    letterSpacing: -0.3,
+    color: '#18181B',
+    letterSpacing: -0.2,
   },
-  actionButton: {
-    flexDirection: 'row',
+  arrowButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 2,
-  },
-  actionText: {
-    fontSize: 13,
-    fontFamily: Typography.sans.semiBold,
-    color: Colors.primary,
   },
 });

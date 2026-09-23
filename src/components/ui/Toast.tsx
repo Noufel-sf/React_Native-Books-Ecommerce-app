@@ -47,34 +47,34 @@ export const ToastContainer: React.FC = () => {
   const getIcon = () => {
     switch (currentToast.type) {
       case 'error':
-        return <AlertTriangle size={17} color="#EF4444" strokeWidth={2} />;
+        return <AlertTriangle size={16} color="#18181B" strokeWidth={2.5} />;
       case 'info':
-        return <Info size={17} color="#3B82F6" strokeWidth={2} />;
+        return <Info size={16} color="#18181B" strokeWidth={2.5} />;
       case 'success':
       default:
-        return <ShoppingBag size={17} color="#D97706" strokeWidth={2} />;
+        return <Check size={16} color="#18181B" strokeWidth={3} />;
     }
   };
 
   const getIconBgColor = () => {
     switch (currentToast.type) {
       case 'error':
-        return '#FEE2E2';
+        return '#FF6B4A'; // Tangerine / Red
       case 'info':
-        return '#EFF6FF';
+        return '#38BDF8'; // Cyan Blue
       case 'success':
       default:
-        return '#FEF3C7';
+        return '#FFD027'; // Cyber Yellow
     }
   };
 
   return (
     <View
       pointerEvents="box-none"
-      style={[styles.container, { top: Math.max(insets.top + 8, 16) }]}
+      style={[styles.container, { top: Math.max(insets.top + 10, Platform.OS === 'web' ? 24 : 16) }]}
     >
       <Animated.View style={[styles.toastCard, animatedStyle]}>
-        {/* Leading Icon */}
+        {/* Leading Icon with Pop Border */}
         <View style={[styles.iconBox, { backgroundColor: getIconBgColor() }]}>
           {getIcon()}
         </View>
@@ -100,7 +100,7 @@ export const ToastContainer: React.FC = () => {
             }}
             style={({ pressed }) => [
               styles.actionBtn,
-              { opacity: pressed ? 0.8 : 1 },
+              { transform: [{ scale: pressed ? 0.95 : 1 }] },
             ]}
           >
             <Text style={styles.actionBtnText}>{currentToast.actionLabel}</Text>
@@ -114,7 +114,7 @@ export const ToastContainer: React.FC = () => {
           style={styles.closeBtn}
           accessibilityLabel="Dismiss notification"
         >
-          <X size={15} color="#9CA3AF" strokeWidth={2} />
+          <X size={15} color="#18181B" strokeWidth={2.2} />
         </Pressable>
       </Animated.View>
     </View>
@@ -124,30 +124,32 @@ export const ToastContainer: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: 16,
-    right: 16,
+    left: 20,
+    right: 20,
     zIndex: 9999,
     elevation: 9999,
     alignItems: 'center',
   },
   toastCard: {
     width: '100%',
-    maxWidth: 500,
-    borderRadius: BorderRadius.xl, // 20px
+    maxWidth: 480,
+    borderRadius: BorderRadius.full,
     backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderWidth: 1.8,
+    borderColor: '#18181B',
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    ...Shadows.floating,
+    ...Shadows.popMd,
   },
   iconBox: {
     width: 32,
     height: 32,
-    borderRadius: BorderRadius.full,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#18181B',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -156,27 +158,36 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 13,
-    fontFamily: Typography.sans.semiBold,
-    color: '#1A1A1A',
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
   },
   message: {
     fontSize: 11.5,
-    fontFamily: Typography.sans.regular,
+    fontFamily: Typography.sans.medium,
     color: '#6B7280',
     marginTop: 1,
   },
   actionBtn: {
-    backgroundColor: '#D97706',
+    backgroundColor: '#FFD027', // Cyber Yellow
     borderRadius: BorderRadius.full,
+    borderWidth: 1.5,
+    borderColor: '#18181B',
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   actionBtnText: {
     fontSize: 11,
-    fontFamily: Typography.sans.semiBold,
-    color: '#FFFFFF',
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
   },
   closeBtn: {
-    padding: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1.2,
+    borderColor: '#18181B',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

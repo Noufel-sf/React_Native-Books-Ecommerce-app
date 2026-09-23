@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
             id: `user-${Date.now()}`,
             name: name.trim(),
             email: email.toLowerCase().trim(),
-            avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
+            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
             isVerified: true,
             unreadNotifications: 1,
           },

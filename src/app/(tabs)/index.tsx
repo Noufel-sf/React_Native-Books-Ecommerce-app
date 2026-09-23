@@ -1,7 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
-  Text,
   ScrollView,
   FlatList,
   StyleSheet,
@@ -11,47 +10,59 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { HomeHeader } from '@/components/layout/HomeHeader';
-import { BookHeroBanner } from '@/components/product/BookHeroBanner';
+import { NeoPopSearchBar } from '@/components/ui/NeoPopSearchBar';
 import { CategorySelector } from '@/components/ui/CategorySelector';
+import { TrendingBooksCard } from '@/components/product/TrendingBooksCard';
+import { SpotlightEbookCard } from '@/components/product/SpotlightEbookCard';
+import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { BookCard } from '@/components/product/BookCard';
-import { ContinueReadingCard } from '@/components/product/ContinueReadingCard';
-import {
-  HERO_BOOK,
-  BOOKS,
-  CONTINUE_READING_BOOKS,
-} from '@/data/books';
-import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
-import {
-  BookSkeletonCard,
-  HeroSkeletonBanner,
-  ContinueReadingSkeleton,
-} from '@/components/ui/SkeletonLoader';
+import { BOOKS, AUTHORITY_BOOK } from '@/data/books';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
     if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      Haptics.impactAsync?.(Haptics.ImpactFeedbackStyle.Light).catch?.(() => {});
     }
     setTimeout(() => {
       setIsRefreshing(false);
-    }, 900);
+    }, 700);
   }, []);
 
-  // Filter books based on category
-  const filteredBooks = useMemo(() => {
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      router.push({
+        pathname: '/(tabs)/explore',
+        params: { q: searchQuery.trim() },
+      });
+    }
+  };
+
+  // Trending books matching reference mockup (Screen 1)
+  const trendingBooks = BOOKS.slice(0, 5);
+
+  // Spotlight book matching reference mockup (Screen 3)
+  const spotlightBook =
+    BOOKS.find((b) => b.id === 'muscle-trovelutions') ??
+    BOOKS[3];
+
+  // More Recommended books
+  const filteredRecommended = useMemo(() => {
     if (selectedCategory === 'all') {
-      return BOOKS;
+      return BOOKS.filter((b) => b.id !== spotlightBook.id);
     }
     return BOOKS.filter((b) =>
       b.genres.some((g) => g.toLowerCase() === selectedCategory.toLowerCase())
     );
-  }, [selectedCategory]);
+  }, [selectedCategory, spotlightBook]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -64,63 +75,55 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.primary}
-            colors={[Colors.primary]}
+            tintColor="#FF6B4A"
+            colors={['#FF6B4A']}
           />
         }
       >
-        {/* User Greeting Header */}
+        {/* Screen 1: Top Navigation Header (Tangerine launcher & profile) */}
         <HomeHeader />
 
-        {isRefreshing ? (
-          <View style={{ marginTop: 6 }}>
-            <HeroSkeletonBanner />
-            <SectionHeader title="Loading Books..." />
-            <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 20 }}>
-              <BookSkeletonCard width={140} />
-              <BookSkeletonCard width={140} />
-            </View>
-          </View>
-        ) : (
-          <>
-            {/* Hero Card Banner */}
-            <BookHeroBanner book={HERO_BOOK} />
+        {/* Screen 1: Search Bar with Cyber Yellow 3D Offset Slab */}
+        <NeoPopSearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmit={handleSearchSubmit}
+        />
 
-            {/* Genre Category Selector Tabs */}
-            <CategorySelector
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-            />
+        {/* Neo-Pop Category Filter Pills */}
+        <CategorySelector
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
 
-            {/* Horizontal Books Carousel */}
-            <FlatList
-              horizontal
-              data={filteredBooks}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <BookCard book={item} width={138} />}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalListContent}
-            />
+        {/* Screen 1: Trending Book Electric Sky-Blue Curved Container */}
+        <TrendingBooksCard books={trendingBooks} />
 
-            {/* Continue Reading Section */}
-            <SectionHeader
-              title="Continue Reading"
-              actionText="View all"
-              onActionPress={() => {}}
-            />
+        {/* Screen 3 Spotlight: Top E-Book Reading Card */}
+        <SpotlightEbookCard book={spotlightBook} />
 
-            {/* Horizontal Continue Reading Shelf */}
-            <FlatList
-              horizontal
-              data={CONTINUE_READING_BOOKS}
-              keyExtractor={(item) => `continue-${item.id}`}
-              renderItem={({ item }) => <ContinueReadingCard book={item} />}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.continueListContent}
-            />
-          </>
-        )}
+        {/* Screen 1: Continue Reading Card with Dashed Progress Ring */}
+        <ContinueReadingCard book={AUTHORITY_BOOK} />
 
+        {/* Additional Section: More Recommended Shelf */}
+        <SectionHeader
+          title="More Recomended"
+          actionText="View all"
+          onActionPress={() => router.push('/(tabs)/explore')}
+        />
+
+        <View style={styles.recommendedListWrapper}>
+          <FlatList
+            horizontal
+            data={filteredRecommended}
+            keyExtractor={(item) => `home-rec-${item.id}`}
+            renderItem={({ item }) => <BookCard book={item} width={138} />}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.recommendedListContent}
+          />
+        </View>
+
+        {/* Bottom padding for floating dock */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeAreaView>
@@ -133,20 +136,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 24,
     backgroundColor: '#FFFFFF',
   },
-  horizontalListContent: {
-    paddingLeft: 20,
-    paddingRight: 8,
-    paddingTop: 6,
-    paddingBottom: 10,
+  recommendedListWrapper: {
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
+    marginBottom: 16,
   },
-  continueListContent: {
+  recommendedListContent: {
     paddingLeft: 20,
     paddingRight: 8,
     paddingTop: 4,
-    paddingBottom: 14,
+    paddingBottom: 6,
   },
   bottomSpacer: {
     height: 90,

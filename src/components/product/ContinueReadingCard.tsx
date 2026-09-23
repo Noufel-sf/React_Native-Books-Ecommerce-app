@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Star, Bookmark } from 'lucide-react-native';
+import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import { Image } from 'expo-image';
+import { Star, ArrowRight } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { Book } from '@/types/book';
 import { useReadingProgressStore } from '@/store/readingProgressStore';
 import { BookReaderModal } from '@/components/product/BookReaderModal';
-import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
+import { Typography, BorderRadius } from '@/constants/theme';
 
 interface ContinueReadingCardProps {
   book: Book;
@@ -21,65 +22,88 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book, 
   const progressPercent =
     liveProgress !== undefined
       ? liveProgress.progressPercent
-      : (book.readingProgress ?? 40);
+      : (book.readingProgress ?? 65);
 
-  const handlePress = () => {
+  const handleCardPress = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync?.().catch?.(() => {});
+    }
     setReaderVisible(true);
   };
 
+  const handleArrowPress = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync?.().catch?.(() => {});
+    }
+    router.push('/(tabs)/reading');
+  };
+
   return (
-    <View style={[styles.container, fullWidth && styles.containerFullWidth]}>
-      <Pressable
-        onPress={handlePress}
-        style={({ pressed }) => [
-          styles.card,
-          fullWidth && styles.cardFullWidth,
-          { opacity: pressed ? 0.95 : 1 },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={`Continue reading ${book.title}`}
-      >
-        {/* Left: Thumbnail Cover */}
-        <View style={styles.thumbnailFrame}>
-          <Image
-            source={{ uri: book.coverImage }}
-            style={styles.thumbnailImage}
-            contentFit="cover"
-            transition={200}
-          />
+    <View style={styles.outerContainer}>
+      {/* Outer White Card with Black Outline */}
+      <View style={styles.cardContainer}>
+        {/* Header Row */}
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>Continue Reading</Text>
+          <Pressable
+            onPress={handleArrowPress}
+            style={({ pressed }) => [
+              styles.arrowButton,
+              { transform: [{ scale: pressed ? 0.92 : 1 }] },
+            ]}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="View all library reading books"
+          >
+            <ArrowRight size={16} color="#18181B" strokeWidth={2.4} />
+          </Pressable>
         </View>
 
-        {/* Right: Book Details & Slim Progress */}
-        <View style={styles.detailsContainer}>
-          {/* Rating & Bookmark Row */}
-          <View style={styles.topMetaRow}>
-            <View style={styles.ratingBox}>
-              <Star size={10} color="#FBBF24" fill="#FBBF24" />
-              <Text style={styles.ratingText}>{book.rating.toFixed(1)}</Text>
-            </View>
-            <View style={styles.bookmarkTag}>
-              <Bookmark size={10} color="#6366F1" fill="#6366F1" />
-            </View>
-          </View>
-
-          {/* Title */}
-          <Text style={styles.title} numberOfLines={1}>
-            {book.title}
-          </Text>
-
-          {/* Author */}
-          <Text style={styles.author} numberOfLines={1}>
-            {book.author}
-          </Text>
-
-          {/* Sleek Minimal Progress Track */}
-          <View style={styles.progressTrack}>
-            <View
-              style={[styles.progressBarFill, { width: `${progressPercent}%` }]}
+        {/* Content Row: Circular Thumbnail + Info + Dashed Progress Circle */}
+        <Pressable
+          onPress={handleCardPress}
+          style={({ pressed }) => [
+            styles.contentCard,
+            { transform: [{ scale: pressed ? 0.98 : 1 }] },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={`Continue reading ${book.title}`}
+        >
+          {/* Circular Thumbnail Cover with Black Outline */}
+          <View style={styles.avatarCover}>
+            <Image
+              source={{ uri: book.coverImage }}
+              style={styles.avatarImage}
+              contentFit="cover"
             />
           </View>
-        </View>
-      </Pressable>
+
+          {/* Book Info */}
+          <View style={styles.bookInfo}>
+            <Text style={styles.bookTitle} numberOfLines={1}>
+              {book.title}
+            </Text>
+            <Text style={styles.bookAuthor} numberOfLines={1}>
+              By {book.author}
+            </Text>
+            <View style={styles.starsRow}>
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={10}
+                  color="#FBBF24"
+                  fill={i < Math.round(book.rating) ? '#FBBF24' : 'transparent'}
+                />
+              ))}
+            </View>
+          </View>
+
+          {/* Dashed Circular Progress Ring */}
+          <View style={styles.progressCircleDashed}>
+            <Text style={styles.progressText}>{progressPercent}%</Text>
+          </View>
+        </Pressable>
+      </View>
 
       {/* Reader Modal */}
       <BookReaderModal
@@ -96,86 +120,98 @@ export const ContinueReadingCard: React.FC<ContinueReadingCardProps> = ({ book, 
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginRight: 14,
-  },
-  containerFullWidth: {
-    marginRight: 0,
+  outerContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
     width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
   },
-  card: {
+  cardContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: BorderRadius.lg, // 16px
-    padding: 12,
+    borderRadius: 28,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    padding: 16,
+  },
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: 240,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    ...Shadows.card,
+    justifyContent: 'space-between',
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
-  cardFullWidth: {
-    width: '100%',
+  headerTitle: {
+    fontSize: 16,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
+    letterSpacing: -0.2,
   },
-  thumbnailFrame: {
+  arrowButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.8,
+    borderColor: '#18181B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  avatarCover: {
     width: 48,
-    height: 68,
-    borderRadius: BorderRadius.xs, // 6px
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1.8,
+    borderColor: '#18181B',
     overflow: 'hidden',
     backgroundColor: '#F3F4F6',
     marginRight: 12,
-    ...Shadows.sm,
   },
-  thumbnailImage: {
+  avatarImage: {
     width: '100%',
     height: '100%',
   },
-  detailsContainer: {
+  bookInfo: {
     flex: 1,
     justifyContent: 'center',
   },
-  topMetaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  ratingBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-  },
-  ratingText: {
-    fontSize: 10.5,
-    fontFamily: Typography.sans.semiBold,
-    color: '#D97706',
-  },
-  bookmarkTag: {
-    padding: 2,
-  },
-  title: {
-    fontSize: 13,
-    fontFamily: Typography.sans.semiBold,
-    color: Colors.text.primary,
+  bookTitle: {
+    fontSize: 14,
+    fontFamily: Typography.sans.bold,
+    color: '#18181B',
     letterSpacing: -0.2,
   },
-  author: {
+  bookAuthor: {
     fontSize: 11,
-    fontFamily: Typography.sans.regular,
-    color: '#8E8E93',
+    fontFamily: Typography.sans.medium,
+    color: '#6B7280',
     marginTop: 1,
-    marginBottom: 6,
+    marginBottom: 3,
   },
-  progressTrack: {
-    height: 3.5,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 2,
-    overflow: 'hidden',
-    width: '100%',
+  starsRow: {
+    flexDirection: 'row',
+    gap: 2,
   },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: Colors.primary, // Golden amber #D97706
-    borderRadius: 2,
+  progressCircleDashed: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1.8,
+    borderColor: '#FF6B4A', // Tangerine / Coral dashed ring
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF7ED',
+  },
+  progressText: {
+    fontSize: 11.5,
+    fontFamily: Typography.sans.bold,
+    color: '#FF6B4A',
   },
 });
